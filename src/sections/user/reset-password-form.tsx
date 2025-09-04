@@ -21,7 +21,7 @@ import {
 } from 'src/api/user';
 import MenuItem from '@mui/material/MenuItem';
 import React from 'react'
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ const createResetPasswordSchema = () => zod.object({
     .refine(value => value, { message: '请输入数量' }),
   tx_at: zod
     .string()
-    .refine(value => value, { message: '请选择认购时间' }),
+    .refine(value => value && dayjs(value).isValid(), { message: '请选择认购时间' }),
 });
 
 export const ResetPasswordSchema = zod.object({
@@ -54,7 +54,7 @@ export const ResetPasswordSchema = zod.object({
     .refine(value => value >= 1, { message: '请输入数量' }),
   tx_at: zod
     .string()
-    .refine(value => value, { message: '请选择认购时间' }),
+    .refine(value => value && dayjs(value).isValid(), { message: '请选择认购时间' }),
 });
 
 // ----------------------------------------------------------------------
@@ -184,11 +184,9 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
               placeholder="请输入数量"
             />
 
-            <DateTimePicker
+            <Field.DateTimePicker
               name="tx_at"
               label="认购时间"
-              views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
-              format="YYYY-MM-DD HH:mm:ss"
             />
           </Stack>
 
