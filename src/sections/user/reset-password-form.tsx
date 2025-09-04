@@ -21,6 +21,7 @@ import {
 } from 'src/api/user';
 import MenuItem from '@mui/material/MenuItem';
 import React from 'react'
+import { fIsAfter } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +37,9 @@ const createResetPasswordSchema = () => zod.object({
   quantity: zod
     .number()
     .refine(value => value, { message: '请输入数量' }),
+  tx_at: zod
+    .string()
+    .refine(value => value, { message: '请选择认购时间' }),
 });
 
 export const ResetPasswordSchema = zod.object({
@@ -48,6 +52,9 @@ export const ResetPasswordSchema = zod.object({
   quantity: zod
     .number()
     .refine(value => value >= 1, { message: '请输入数量' }),
+  tx_at: zod
+    .string()
+    .refine(value => value, { message: '请选择认购时间' }),
 });
 
 // ----------------------------------------------------------------------
@@ -70,6 +77,7 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
       hash: '',
       product_id: Infinity,
       quantity: 1,
+      tx_at: new Date().toString()
     },
   });
 
@@ -79,14 +87,14 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = handleSubmit(async ({ hash, product_id, quantity }) => {
+  const onSubmit = handleSubmit(async ({ hash, product_id, quantity, tx_at }) => {
     try {
       const submitData: ConfirmNodeSubscriptionRequest = {
         address: currentUser.address!,
         hash,
         product_id: product_id!,
         quantity,
-        tx_at: Math.floor(Date.now() / 1000),
+        tx_at: Math.floor(new Date(tx_at).getTime() / 1000),
       };
 
       onSubmitSuccess(submitData);
@@ -174,6 +182,11 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
               label="数量"
               type="number"
               placeholder="请输入数量"
+            />
+
+            <Field.DatePicker
+              name="tx_at"
+              label="认购时间"
             />
           </Stack>
 
