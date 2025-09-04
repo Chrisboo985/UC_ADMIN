@@ -32,7 +32,7 @@ const createResetPasswordSchema = () => zod.object({
     .refine(value => value, { message: '请输入订单哈希/订单号' }),
   product_id: zod
     .number()
-    .refine(value => value, { message: '请选择产品' }),
+    .refine(value => value !== Infinity, { message: '请选择产品' }),
   quantity: zod
     .number()
     .refine(value => value, { message: '请输入数量' }),
