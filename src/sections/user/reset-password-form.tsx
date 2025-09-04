@@ -21,7 +21,7 @@ import {
 } from 'src/api/user';
 import MenuItem from '@mui/material/MenuItem';
 import React from 'react'
-import { fIsAfter } from 'src/utils/format-time';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 // ----------------------------------------------------------------------
 
@@ -184,9 +184,11 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
               placeholder="请输入数量"
             />
 
-            <Field.DatePicker
+            <DateTimePicker
               name="tx_at"
               label="认购时间"
+              views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
+              format="YYYY-MM-DD HH:mm:ss"
             />
           </Stack>
 
