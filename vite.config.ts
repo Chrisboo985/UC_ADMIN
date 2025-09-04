@@ -32,10 +32,10 @@ export default defineConfig(async ({ command, mode }) => {
       react(),
       checker({
         typescript: true,
-        eslint: {
-          lintCommand: 'eslint "./src/**/*.{js,jsx,ts,tsx}"',
-          dev: { logLevel: ['error'] },
-        },
+        // eslint: {
+        //   lintCommand: 'eslint "./src/**/*.{js,jsx,ts,tsx}"',
+        //   dev: { logLevel: ['error'] },
+        // },
         overlay: {
           position: 'tl',
           initialIsOpen: false,
@@ -66,7 +66,7 @@ export default defineConfig(async ({ command, mode }) => {
       host: true,
       proxy: {
         '/admin': {
-          target: 'http://192.168.191.19:9997',
+          target: 'https://apiuc.tronify.net',
           changeOrigin: true,
           secure: false,
         },

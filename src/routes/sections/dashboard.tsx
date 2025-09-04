@@ -282,7 +282,7 @@ export const dashboardRoutes = [
         path: 'communityGovernance',
         children: [
           { element: <CommunityGovernanceView />, index: true },
-         
+
           { path: 'unionData', element: <CommunityGovernanceView /> },
           { path: 'communityPerformanceSummary', element: <CommunityPerformanceSummaryView /> },
           { path: 'bondBuy', element: <BondBuyView /> },

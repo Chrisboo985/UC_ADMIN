@@ -14,37 +14,40 @@ import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 
 import { Form, Field } from 'src/components/hook-form';
+import {
+  type ConfirmNodeSubscriptionRequest,
+  getProductList,
+  type GetProductListResponse
+} from 'src/api/user';
+import MenuItem from '@mui/material/MenuItem';
+import React from 'react'
 
 // ----------------------------------------------------------------------
 
 export type ResetPasswordSchemaType = zod.infer<typeof ResetPasswordSchema>;
 
-const createResetPasswordSchema = (needSurety: boolean) => zod.object({
-  login_pass: zod
+const createResetPasswordSchema = () => zod.object({
+  hash: zod
     .string()
-    .min(6, { message: '登录密码至少6位' })
-    .max(50, { message: '登录密码不能超过50个字符' }),
-  true_pass: zod
-    .string()
-    .min(6, { message: '交易密码至少6位' })
-    .max(50, { message: '交易密码不能超过50个字符' }),
-  surety: needSurety 
-    ? zod.string().min(1, { message: '担保人信息不能为空' })
-    : zod.string().optional(),
+    .refine(value => value, { message: '请输入订单哈希/订单号' }),
+  product_id: zod
+    .number()
+    .refine(value => value, { message: '请选择产品' }),
+  quantity: zod
+    .number()
+    .refine(value => value, { message: '请输入数量' }),
 });
 
 export const ResetPasswordSchema = zod.object({
-  login_pass: zod
+  hash: zod
     .string()
-    .min(6, { message: '登录密码至少6位' })
-    .max(50, { message: '登录密码不能超过50个字符' }),
-  true_pass: zod
-    .string()
-    .min(6, { message: '交易密码至少6位' })
-    .max(50, { message: '交易密码不能超过50个字符' }),
-  surety: zod
-    .string()
-    .optional(),
+    .refine(value => value, { message: '请输入订单哈希/订单号' }),
+  product_id: zod
+    .number()
+    .refine(value => value !== Infinity, { message: '请选择产品' }),
+  quantity: zod
+    .number()
+    .refine(value => value >= 1, { message: '请输入数量' }),
 });
 
 // ----------------------------------------------------------------------
@@ -52,23 +55,21 @@ export const ResetPasswordSchema = zod.object({
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmitSuccess: (data: { id: number; login_pass: string; true_pass: string; surety: string }) => void;
+  onSubmitSuccess: (data: ConfirmNodeSubscriptionRequest) => void;
   currentUser: IUserItemforlist;
 };
 
 export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess }: Props) {
-  // 判断是否需要显示担保人输入框（等级5或以上不需要）
-  const needSurety = !currentUser.calc_level || currentUser.calc_level < 5;
+  const [productList, setProductList] = React.useState<GetProductListResponse>([])
+  const dynamicSchema = createResetPasswordSchema();
 
-  const dynamicSchema = createResetPasswordSchema(needSurety);
-  
   const methods = useForm<ResetPasswordSchemaType>({
     mode: 'all',
     resolver: zodResolver(dynamicSchema),
     defaultValues: {
-      login_pass: '',
-      true_pass: '',
-      surety: '',
+      hash: '',
+      product_id: Infinity,
+      quantity: 1,
     },
   });
 
@@ -78,13 +79,14 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async ({ hash, product_id, quantity }) => {
     try {
-      const submitData = {
-        id: currentUser.id!,
-        login_pass: data.login_pass,
-        true_pass: data.true_pass,
-        surety: needSurety && data.surety ? data.surety : '',
+      const submitData: ConfirmNodeSubscriptionRequest = {
+        address: currentUser.address!,
+        hash,
+        product_id: product_id!,
+        quantity,
+        tx_at: Math.floor(Date.now() / 1000),
       };
 
       onSubmitSuccess(submitData);
@@ -99,12 +101,28 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
     onClose();
   }, [reset, onClose]);
 
+  React.useEffect(
+    () => {
+      ~(async () => {
+        try {
+          const res = await getProductList()
+
+          const { code, data } = res
+
+          if (code !== 0) return
+          setProductList(data)
+        } catch(error) {}
+      })()
+    },
+    []
+  )
+
   if (!open) return null;
 
   return (
     <>
       <DialogTitle sx={{ minHeight: 60 }}>
-        重置密码
+        节点认购
       </DialogTitle>
 
       <DialogContent sx={{ p: 2, pb: 0, display: 'flex', flexDirection: 'column', minHeight: 200 }}>
@@ -112,7 +130,7 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
           <Stack spacing={2} sx={{ flex: 1 }}>
             <Box>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                用户信息
+                认购用户地址
               </Typography>
               <Typography
                 variant="body2"
@@ -125,34 +143,38 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
                   fontSize: '0.875rem'
                 }}
               >
-                ID: {currentUser.id} | 地址: {currentUser.address || '未设置'}
+                {currentUser.address || '未设置'}
               </Typography>
             </Box>
 
             <Field.Text
-              name="login_pass"
-              label="新登录密码"
-              type="password"
-              placeholder="请输入新的登录密码（6-50位）"
+              name="hash"
+              label="订单哈希/订单号"
+              type="text"
+              placeholder="请输入订单哈希/订单号"
             />
+
+            <Field.Select
+              name="product_id"
+              label="产品"
+              type="text"
+              placeholder="请选择产品"
+            >
+              <MenuItem value={ Infinity } disabled>暂未选择产品</MenuItem>
+              { productList.map(({ id, name }) => (
+                <MenuItem key={ id } value={ id }>
+                  { name }
+                  </MenuItem>
+                ))
+              }
+            </Field.Select>
 
             <Field.Text
-              name="true_pass"
-              label="新交易密码"
-              type="password"
-              placeholder="请输入新的交易密码（6-50位）"
+              name="quantity"
+              label="数量"
+              type="number"
+              placeholder="请输入数量"
             />
-
-            {needSurety && (
-              <>
-                <Field.Text
-                  name="surety"
-                  label="担保人"
-                  placeholder="请输入担保人编码或地址"
-                  required={needSurety}
-                />
-              </>
-            )}
           </Stack>
 
           <DialogActions sx={{ px: 0, pb: 1, mt: 'auto' }}>
@@ -164,7 +186,7 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
               variant="contained"
               loading={isSubmitting}
             >
-              确认重置
+              确认
             </LoadingButton>
           </DialogActions>
         </Form>

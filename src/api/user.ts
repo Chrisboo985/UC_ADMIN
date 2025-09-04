@@ -909,3 +909,22 @@ export interface TransferLogResponse {
 export const getTransferLogAPI = (data: TransferLogRequest) =>
   axios.post<TransferLogResponse>('/admin/transfer_log/list', data);
 
+export interface ConfirmNodeSubscriptionRequest {
+  address: string;
+  hash: string;
+  product_id: number;
+  quantity: number;
+  tx_at: number;
+}
+
+export const confrimNodeSubscriptionAPI = (data: ConfirmNodeSubscriptionRequest) => axios.post('/admin/member/node_purchase', data)
+
+export type GetProductListResponse = Array<{
+  id: number;
+  name: string;
+}>
+
+export const getProductList = () => axios.post<GetProductListResponse>('/admin/product/all')
+
+
+

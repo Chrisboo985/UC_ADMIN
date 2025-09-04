@@ -83,6 +83,8 @@ import {
   type UpdateMemberAddressStatusRequest,
   updateMemberWithdrawStatusAPI,
   type UpdateMemberWithdrawStatusRequest,
+  confrimNodeSubscriptionAPI,
+  type ConfirmNodeSubscriptionRequest
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -340,20 +342,20 @@ export function UserListView(props: { h: boolean }) {
   }, []);
 
   // 提交重置密码
-  const handleSubmitResetPassword = useCallback(async (data: ResetPasswordRequest) => {
-    const toastId = toast.loading('正在重置密码...');
+  const handleSubmitResetPassword = useCallback(async (data: ConfirmNodeSubscriptionRequest) => {
+    const toastId = toast.loading('正在认购...');
     try {
-      const response = await resetPasswordAPI(data);
+      const response = await confrimNodeSubscriptionAPI(data);
       if (response.code === 0) {
-        toast.success('密码重置成功');
+        toast.success('认购成功');
         handleCloseResetPasswordDialog();
         getList(); // 刷新列表
       } else {
-        toast.error(response.message || '密码重置失败');
+        toast.error(response.message || '认购失败');
       }
     } catch (error: any) {
-      console.error('重置密码失败:', error);
-      toast.error(error.message || '密码重置失败，请稍后再试');
+      console.error('认购失败:', error);
+      toast.error(error.message || '认购失败');
     } finally {
       toast.dismiss(toastId);
     }
@@ -628,477 +630,94 @@ export function UserListView(props: { h: boolean }) {
 
   const columns: GridColDef[] = [
     {
-      field: 'member_code',
-      headerName: '用户编码',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.member_code || '-'} />,
-    },
-    {
-      field: 'h_username',
-      headerName: '登录名',
-      minWidth: 120,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.h_username || '-'} />,
-    },
-    {
-      field: 'h_nickname',
-      headerName: '用户昵称',
-      minWidth: 100,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.h_nickname || '-'} />,
-    },
-    {
       field: 'address',
-      headerName: '用户地址',
-      minWidth: 200,
-      flex: 1,
-      renderCell: (params) => (
-        <CellWithTooltipCopy value={params.row.address} props={{ displayLength: 16 }} />
-      ),
+      headerName: '地址 ',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
     },
     {
-      field: 'address_status',
-      headerName: '地址状态',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Switch
-          checked={params.row.address_status === 'normal'}
-          onChange={(event) => {
-            const newStatus = event.target.checked ? 'normal' : 'blocked';
-            setSelectedUserForAddressStatus(params.row);
-            setNewAddressStatus(newStatus);
-            setOpenAddressStatusDialog(true);
-          }}
-          color={params.row.address_status === 'normal' ? 'success' : 'error'}
-        />
-      ),
+      field: 'dynamic_reward',
+      headerName: '动态奖',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.dynamic_reward || '-'} />,
     },
     {
-      field: 'is_active',
-      headerName: '激活状态',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Label variant="soft" color={params.row.is_active === 'active' ? 'success' : 'error'}>
-          {params.row.is_active === 'active' ? '已激活' : '未激活'}
-        </Label>
-      ),
-    },
-    {
-      field: 'status',
-      headerName: '用户状态',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Switch
-          checked={params.row.status === 'normal'}
-          onChange={(event) => {
-            const newStatus = event.target.checked ? 'normal' : 'blocked';
-            setSelectedUser(params.row);
-            setNewUserStatus(newStatus);
-            setOpenStatusDialog(true);
-          }}
-          color={params.row.status === 'normal' ? 'success' : 'error'}
-        />
-      ),
-    },
-    {
-      field: 'withdraw_status',
-      headerName: '提现状态',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Switch
-          checked={params.row.withdraw_status === 'normal'}
-          onChange={(event) => {
-            const newStatus = event.target.checked ? 'normal' : 'blocked';
-            setSelectedUserForWithdrawStatus(params.row);
-            setNewWithdrawStatus(newStatus);
-            setOpenWithdrawStatusDialog(true);
-          }}
-          color={params.row.withdraw_status === 'normal' ? 'success' : 'error'}
-        />
-      ),
-    },
-    {
-      field: 'is_business',
-      headerName: '是否商家',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Label variant="soft" color={params.row.is_business ? 'success' : 'error'}>
-          {params.row.is_business ? '是' : '否'}
-        </Label>
-      ),
+      field: 'ip',
+      headerName: 'IP地址',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.ip || '-'} />,
     },
     {
       field: 'level',
       headerName: '等级',
-      renderCell: (params) => <CellWithTooltipCopy value={calcLevel(params.row.level)|| '-'} />,
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.level || '-'} />,
     },
     {
-      field: 'virtual_level',
-      headerName: '虚拟等级',
-      renderCell: (params) => <CellWithTooltipCopy value={calcLevel(params.row.virtual_level) || '-'} />,
+      field: 'level_up_reward',
+      headerName: '晋级奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.level_up_reward || '-'} />,
     },
     {
-      field: 'star_level',
-      headerName: '星级',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.star_level || '-'} />,
-    },
-    {
-      field: 'mc',
-      headerName: 'MC',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'mc')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'mc')}
-            value={params.row.mc || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'parent_address',
-      headerName: '上级地址',
-      minWidth: 190,
-      flex: 1,
-      renderCell: (params) => {
-        const value = params.row.parent_address;
-        if (!value) return <CellWithTooltipCopy value="-" />;
-
-        return (
-          <Box
-            onClick={() => handleParentAddressClick(value)}
-            sx={{
-              color: 'primary.main',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              textDecorationStyle: 'dotted',
-              '&:hover': {
-                color: 'primary.dark',
-                backgroundColor: 'action.hover',
-                borderRadius: 1,
-                px: 0.5,
-              },
-            }}
-          >
-            <CellWithTooltipCopy
-              value={value}
-              onClick={() => handleParentAddressClick(value)}
-              props={{ displayLength: 16 }}
-            />
-          </Box>
-        );
-      },
+      field: 'parent_id',
+      headerName: '上级id',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.parent_id || '-'} />,
     },
     {
       field: 'power',
-      headerName: '有效算力',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.power} />,
-    },
-        {
-      field: 'large_team_power_total',
-      headerName: '大团队累积算力',
-      minWidth: 150,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.large_team_power_total} />,
+      headerName: '算力',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.power || '-'} />,
     },
     {
-      field: 'small_team_power_total',
-      headerName: '小团队累积算力',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.small_team_power_total} />,
+      field: 'receive_reward',
+      headerName: '已领取奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward || '-'} />,
     },
     {
-      field: 'team_power_total',
-      headerName: '团队累积算力',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power_total || 0} />,
-    },
-    {
-      field: 'total_power',
-      headerName: '累积算力',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.total_power || 0} />,
-    },
-    {
-      field: 'hp',
-      headerName: 'HP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'hp')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'hp')}
-            value={params.row.hp || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'tp',
-      headerName: 'TP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'tp')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'tp')}
-            value={params.row.tp || 0}
-          />
-        </Box>
-      ),
-    },
-
-    {
-      field: 'up',
-      headerName: 'UP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'up')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'up')}
-            value={params.row.up || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'wapd',
-      headerName: 'WAPD',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'wapd')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'wapd')}
-            value={params.row.wapd || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'apd',
-      headerName: 'APD',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'apd')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'apd')}
-            value={params.row.apd || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'apd_to_usdt_amount',
-      headerName: 'APD-USDT',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.apd_to_usdt_amount || 0} />,
-    },
-    {
-      field: 'bp',
-      headerName: 'BP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'bp')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'bp')}
-            value={params.row.bp || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'cp',
-      headerName: 'CP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'cp')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'cp')}
-            value={params.row.cp || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'rp',
-      headerName: 'RP',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'rp')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'rp')}
-            value={params.row.rp || 0}
-          />
-        </Box>
-      ),
-    },
-
-    {
-      field: 'xapd',
-      headerName: 'XAPD',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Box
-          onClick={() => handleCapitalFlow(params.row, 'xapd')}
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            textDecorationStyle: 'dotted',
-            '&:hover': {
-              color: 'primary.dark',
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              px: 0.5,
-            },
-          }}
-        >
-          <CellWithTooltipCopy
-            onClick={() => handleCapitalFlow(params.row, 'xapd')}
-            value={params.row.xapd || 0}
-          />
-        </Box>
-      ),
-    },
-    {
-      field: 'xapd_to_usdt_amount',
-      headerName: 'XAPD-USDT',
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.xapd_to_usdt_amount || 0} />,
+      field: 'receive_reward_usdt',
+      headerName: '已领取奖励usdt价值',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward_usdt || '-'} />,
     },
     {
       field: 'remark',
       headerName: '备注',
-      minWidth: 150,
-      flex: 1,
+      minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
     },
     {
-      field: 'id',
-      headerName: 'ID',
-      minWidth: 120,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.id} />,
+      field: 'static_reward',
+      headerName: 'nft 静态奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.static_reward || '-'} />,
+    },
+    {
+      field: 'team_power',
+      headerName: '团队算力',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power || '-'} />,
+    },
+    {
+      field: 'team_usdt_recharge_amount',
+      headerName: '团队USDT充值数量',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_usdt_recharge_amount || '-'} />,
+    },
+    {
+      field: 'usdt_recharge_amount',
+      headerName: 'USDT充值数量',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.usdt_recharge_amount || '-'} />,
+    },
+    {
+      field: 'withdraw_limit',
+      headerName: '提现额度',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.withdraw_limit || '-'} />,
     },
     {
       type: 'actions',
@@ -1115,47 +734,12 @@ export function UserListView(props: { h: boolean }) {
       headerClassName: 'sticky-column',
       cellClassName: 'sticky-column',
       getActions: (params) => [
-        // 重置密码功能
+        // 节点认购
         <GridActionsCellItem
           showInMenu
-          icon={<Iconify icon="mdi:lock-reset" />}
-          label="重置密码"
+          icon={<Iconify icon="mdi:currency-usd" />}
+          label="节点认购"
           onClick={() => handleResetPassword(params.row)}
-          disabled={false}
-        />,
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:edit" />}
-          label="更绑地址"
-          onClick={() => handleAddress(params.row)}
-          disabled={false}
-        />,
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:account-switch" />}
-          label="更改上级"
-          onClick={() => handleChangeSuperior(params.row)}
-          disabled={false}
-        />,
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:arrow-split-horizontal" />}
-          label="设置等级"
-          onClick={() => handleSetLevel(params.row)}
-          disabled={false}
-        />,
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:cash" />}
-          label="资金流水"
-          onClick={() => handleCapitalFlow(params.row, 'tp')}
-          disabled={false}
-        />,
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:account-cancel" />}
-          label="批量网体封禁"
-          onClick={() => handleBatchBan(params.row)}
           disabled={false}
         />,
       ],
@@ -1200,38 +784,6 @@ export function UserListView(props: { h: boolean }) {
                 value={filtersForEdit.state.address}
                 onChange={handleFilterAddress}
                 placeholder="请输入地址"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </FormControl>
-            {/* 登录账号筛选 */}
-            <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
-              <TextField
-                fullWidth
-                value={filtersForEdit.state.h_username}
-                onChange={handleFilterHUsername}
-                placeholder="请输入登录账号"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </FormControl>
-            {/* 用户编码搜索 */}
-            <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
-              <TextField
-                fullWidth
-                value={filtersForEdit.state.member_code || ''}
-                onChange={handleFilterMemberCode}
-                placeholder="请输入用户编码"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
