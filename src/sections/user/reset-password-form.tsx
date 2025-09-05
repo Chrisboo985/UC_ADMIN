@@ -169,9 +169,10 @@ export function ResetPasswordForm({ currentUser, open, onClose, onSubmitSuccess 
               placeholder="请选择产品"
             >
               <MenuItem value={ Infinity } disabled>暂未选择产品</MenuItem>
-              { productList.map(({ id, name }) => (
-                <MenuItem key={ id } value={ id }>
-                  { name }
+              {
+                productList.map(({ id, name, price }) => (
+                  <MenuItem key={ id } value={ id }>
+                    { name } ${ price }
                   </MenuItem>
                 ))
               }

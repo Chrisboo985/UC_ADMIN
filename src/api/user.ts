@@ -922,6 +922,7 @@ export const confrimNodeSubscriptionAPI = (data: ConfirmNodeSubscriptionRequest)
 export type GetProductListResponse = Array<{
   id: number;
   name: string;
+  price: string;
 }>
 
 export const getProductList = () => axios.post<GetProductListResponse>('/admin/product/all')
