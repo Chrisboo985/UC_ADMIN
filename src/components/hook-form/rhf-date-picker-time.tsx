@@ -30,6 +30,7 @@ export function RHFDateTimePicker({ name, slotProps, ...other }: RHFDateTimePick
           format="YYYY-MM-DD HH:mm:ss"
           views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
           ampm={false}
+          timeSteps={{ hours: 1, minutes: 1, seconds: 1 }}
           slotProps={{
             ...slotProps,
             textField: {
