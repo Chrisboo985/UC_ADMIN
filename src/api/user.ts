@@ -926,5 +926,29 @@ export type GetProductListResponse = Array<{
 
 export const getProductList = () => axios.post<GetProductListResponse>('/admin/product/all')
 
+export type getNodeSubscriptionLogListRequest = {
+  page: number;
+  page_size: number;
+}
+export type getNodeSubscriptionLogListResponse = {
+  list: Array<{
+    address: string;
+    admin_id: number;
+    amount: number;
+    hash: string;
+    product_id: number;
+    quantity: number;
+    remark: string;
+    tx_at: number;
+    tx_at_string: string;
+    product: {
+      name: string;
+    };
+  }>;
+  total: number;
+}
+
+export const getNodeSubscriptionLogListAPI = (data: getNodeSubscriptionLogListRequest) => axios.post<getNodeSubscriptionLogListResponse>('/admin/admin_log/node_purchase_log_list', data)
+
 
 

@@ -163,6 +163,9 @@ const BondBonusIndexView = lazy(
 );
 const GameRankingView = lazy(() => import('src/pages/dashboard/gameAdmin/gameRanking'));
 const NftAirdropFlowView = lazy(() => import('src/pages/dashboard/lgns/NFTAirdropFlow'));
+
+/** Log */
+const NodeSubscriptionLogPage = lazy(() => import('src/pages/dashboard/log/list'));
 // ----------------------------------------------------------------------
 
 const BondBuyView = lazy(() => import('src/pages/dashboard/communityGovernance/bondBuy'));
@@ -218,6 +221,13 @@ export const dashboardRoutes = [
           { path: 'new', element: <UserCreatePage /> },
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
+        ],
+      },
+      {
+        path: 'log',
+        children: [
+          { element: <NodeSubscriptionLogPage />, index: true },
+          { title: '节点认购', path: 'nodeSubscription', element: <NodeSubscriptionLogPage /> },
         ],
       },
       {

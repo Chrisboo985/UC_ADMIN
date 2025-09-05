@@ -102,6 +102,15 @@ export const navData = [
         ],
       },
 
+      {
+        title: '日志',
+        path: paths.dashboard.log.root,
+        icon: ICONS.user,
+        children: [
+          { title: '节点认购', path: paths.dashboard.log.nodeSubscription },
+        ],
+      },
+
       // {
       //   title: '合约操作台',
       //   path: paths.dashboard.lgns.root,
