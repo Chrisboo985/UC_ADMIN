@@ -96,6 +96,11 @@ import { AddressForm } from '../address-form';
 import { CapitalFlowForm } from '../capital-flow-form';
 import { ChangeSuperiorForm } from '../change-superior-form';
 import { SetLevelForm } from '../set-level-form';
+import React from 'react'
+import {
+  getProductList,
+  type GetProductListResponse
+} from 'src/api/user';
 // ----------------------------------------------------------------------
 // 筛选常量
 const HIDE_COLUMNS = { category: false };
@@ -108,13 +113,14 @@ type Row = (getNodeSubscriptionLogListResponse['list'][number] & { $productName:
 
 // 用户列表视图主组件
 export function NodeSubscriptionView(props: { h: boolean }) {
+  const [productList, setProductList] = React.useState<GetProductListResponse>([])
   const { h: advancedUserListPage } = props;
 
   const theme = useTheme();
 
   const confirm = useBoolean();
 
-  const filters = useSetState<IUserTableFiltersForList>({
+  const filters = useSetState<IUserTableFiltersForList & { product_id: number }>({
     address: '',
     created_at_end: undefined,
     created_at_start: undefined,
@@ -122,6 +128,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     member_code: '',
     is_business: undefined,
     parent_code: undefined,
+    product_id: Infinity
   });
 
   const filtersForEdit = useSetState<{
@@ -132,6 +139,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     member_code?: string;
     is_business?: boolean;
     parent_code?: string;
+    product_id: number | undefined;
   }>({
     address: '',
     created_at_end: undefined,
@@ -140,6 +148,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     member_code: '',
     is_business: undefined,
     parent_code: undefined,
+    product_id: Infinity,
   });
 
   // 过滤数据
@@ -203,16 +212,23 @@ export function NodeSubscriptionView(props: { h: boolean }) {
   // 筛选条件是否能够重置
   const canReset = !!filtersForEdit.state.address || !!filtersForEdit.state.h_username || !!filtersForEdit.state.member_code || !!filtersForEdit.state.is_business || !!filtersForEdit.state.parent_code || !!filtersForEdit.state.created_at_start || !!filtersForEdit.state.created_at_end;
 
+
+  const handleProductFilter = React.useCallback(
+    (id: number) => {
+      filtersForEdit.setState({ product_id: id });
+    },
+    [filtersForEdit]
+  )
+
   // 获取用户列表
   const getList = useCallback(async () => {
+    console.log(filters.state, 'filters.state')
     const params = {
-      // ...filters.state,
+      ...filters.state,
 
       page: pagination.page,
       page_size: pagination.pageSize,
     };
-
-    console.log('params', params);
 
     setUsersLoading(true);
     await getNodeSubscriptionLogListAPI(params)
@@ -262,6 +278,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
       member_code: filtersForEdit.state.member_code,
       is_business: filtersForEdit.state.is_business,
       parent_code: filtersForEdit.state.parent_code,
+      product_id: filtersForEdit.state.product_id,
     });
   };
 
@@ -639,28 +656,22 @@ export function NodeSubscriptionView(props: { h: boolean }) {
 
   const columns: GridColDef[] = [
     {
-      field: 'address',
-      headerName: '地址 ',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
-    },
-    {
-      field: 'admin_id',
-      headerName: '管理员ID ',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.admin_id || '-'} />,
-    },
-    {
-      field: 'amount',
-      headerName: '购买金额',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.amount || '-'} />,
-    },
-    {
       field: 'hash',
       headerName: '交易哈希',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.hash || '-'} />,
+    },
+    {
+      field: 'tx_at_string',
+      headerName: '交易时间',
+      minWidth: 200,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.tx_at_string || '-'} />,
+    },
+    {
+      field: 'address',
+      headerName: '地址 ',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
     },
     {
       field: '$productName',
@@ -675,22 +686,16 @@ export function NodeSubscriptionView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.quantity || '-'} />,
     },
     {
+      field: 'amount',
+      headerName: '购买金额',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.amount || '-'} />,
+    },
+    {
       field: 'remark',
       headerName: '备注',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
-    },
-    {
-      field: 'tx_at',
-      headerName: '交易时间',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.tx_at || '-'} />,
-    },
-    {
-      field: 'tx_at_string',
-      headerName: '交易时间字符串',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.tx_at_string || '-'} />,
     },
   ];
 
@@ -698,6 +703,24 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     columns
       .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
       .map((column) => column.field);
+
+
+  React.useEffect(
+    () => {
+      ~(async () => {
+        try {
+          const res = await getProductList()
+
+          const { code, data } = res
+
+          if (code !== 0) return
+          setProductList(data)
+        } catch(error) {}
+      })()
+    },
+    []
+  )
+
 
   return (
     <>
@@ -740,6 +763,24 @@ export function NodeSubscriptionView(props: { h: boolean }) {
                   ),
                 }}
               />
+            </FormControl>
+            <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={ filtersForEdit.state.product_id }
+                label="Age"
+                onChange={(e) => handleProductFilter(e.target.value as number)}
+              >
+                <MenuItem value={ Infinity } disabled>请选择您的产品</MenuItem>
+                {
+                  productList.map(({ id, name, price }) => (
+                    <MenuItem key={ id } value={ id }>
+                      { name }
+                    </MenuItem>
+                  ))
+                }
+              </Select>
             </FormControl>
             <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
               <Button variant="contained" onClick={handleFilterData}>

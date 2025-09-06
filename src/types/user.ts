@@ -98,6 +98,7 @@ export type IUserTableFiltersForList = {
   member_code?: string; // 用户编码
   is_business?: boolean; // 是否商家
   parent_code?: string; // 上级编码
+  parent_id?: string; // 上级id
 };
 
 export type IUserItemforlist = {
@@ -136,6 +137,10 @@ export type IUserItemforlist = {
   xapd_to_usdt_amount?: number; // XAPD价值USDT金额
   type?: number; // 会员类型（保留用于筛选）
   remark?: string; // 备注（保留用于筛选）
+
+  parent_member?: {
+    address: string;
+  }
 };
 
 // 社区债券购买记录响应类型

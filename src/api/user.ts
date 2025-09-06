@@ -951,5 +951,32 @@ export type getNodeSubscriptionLogListResponse = {
 
 export const getNodeSubscriptionLogListAPI = (data: getNodeSubscriptionLogListRequest) => axios.post<getNodeSubscriptionLogListResponse>('/admin/admin_log/node_purchase_log_list', data)
 
+export type getMemberListReqeust = {}
+
+export type getMemberListAPIResponse = {
+  list: Array<{
+    address: string;
+    dynamic_reward: number;
+    ip: string;
+    level: number;
+    level_up_reward: number;
+    parent_id: string;
+    parent_member?: {
+      address: string;
+    };
+    power: number;
+    receive_reward: number;
+    receive_reward_usdt: number;
+    remark: string;
+    team_power: number;
+    team_usdt_recharge_amount: number;
+    usdt_recharge_amount: number;
+    withdraw_limit: number;
+  }>;
+  total: number;
+}
+
+export const getMemberListAPI = (data: getMemberListReqeust) => axios.post<getMemberListAPIResponse>('/admin/member/list', data)
+
 
 

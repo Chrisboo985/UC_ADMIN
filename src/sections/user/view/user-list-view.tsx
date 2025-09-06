@@ -25,7 +25,7 @@ import type {
 
 import { useTheme } from '@mui/material/styles';
 import { fIsAfter, fDateRangeShortLabel } from 'src/utils/format-time';
-import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
 
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
@@ -84,7 +84,9 @@ import {
   updateMemberWithdrawStatusAPI,
   type UpdateMemberWithdrawStatusRequest,
   confrimNodeSubscriptionAPI,
-  type ConfirmNodeSubscriptionRequest
+  type ConfirmNodeSubscriptionRequest,
+  getMemberListAPI,
+  type getMemberListAPIResponse
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -99,6 +101,8 @@ import { SetLevelForm } from '../set-level-form';
 const HIDE_COLUMNS = { category: false };
 
 const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
+
+type Row = getMemberListAPIResponse['list'][number] & { $parentAddress: string | undefined; }
 
 // ----------------------------------------------------------------------
 
@@ -117,7 +121,7 @@ export function UserListView(props: { h: boolean }) {
     h_username: '',
     member_code: '',
     is_business: undefined,
-    parent_code: undefined,
+    parent_code: undefined
   });
 
   const filtersForEdit = useSetState<{
@@ -139,7 +143,7 @@ export function UserListView(props: { h: boolean }) {
   });
 
   // 过滤数据
-  const [filteredData, setFilteredData] = useState<IUserItemforlist[]>([]);
+  const [filteredData, setFilteredData] = useState<Row[]>([]);
   // 总计
   const [totalCount, setTotalCount] = useState<number>(0);
   // 当前选中ID
@@ -211,13 +215,14 @@ export function UserListView(props: { h: boolean }) {
     console.log('params', params);
 
     setUsersLoading(true);
-    await getMemberIndexAPI(params)
+    await getMemberListAPI(params)
       .then((apiResult) => {
         console.log('接口返回结果', apiResult);
         const { data, code } = apiResult;
         if (code === 0) {
           // 如果为空，需要设置默认值
-          setFilteredData((data?.list as IUserItemforlist[]) || []);
+          const list = (data?.list || []).map(item => Object.assign(item, { $parentAddress: item.parent_member?.address}))
+          setFilteredData(list);
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -242,7 +247,6 @@ export function UserListView(props: { h: boolean }) {
 
   // 服务端控制 条件筛选
   const handleFilterData = () => {
-    console.log('应用筛选');
 
     // 只保留接口支持的搜索参数
     filters.setState({
@@ -256,13 +260,20 @@ export function UserListView(props: { h: boolean }) {
     });
   };
 
-  const handleParentAddressClick = useCallback((address: string) => {
+
+  const handleParentAddressClick = useCallback(async (address: string) => {
     // 当点击上级地址时，将地址设置到筛选器中并执行筛选
     filtersForEdit.setState({ address });
     // 应用筛选
-    handleFilterData();
     toast.info(`已筛选地址: ${address}`);
   }, [filtersForEdit]);
+
+  React.useEffect(
+    () => {
+     handleFilterData();
+    },
+    [filtersForEdit.state.address]
+  )
 
   // 会员类型选择对话框状态
   const [openTypeDialog, setOpenTypeDialog] = useState(false);
@@ -636,58 +647,42 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
     },
     {
+      field: '$parentAddress',
+      headerName: '上级地址',
+      minWidth: 190,
+      renderCell: (params) => {
+        const value = params.row.$parentAddress;
+        if (!value) return <CellWithTooltipCopy value="-" />;
+
+        return (
+          <Box
+            onClick={() => handleParentAddressClick(value)}
+            sx={{
+              color: 'primary.main',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              textDecorationStyle: 'dotted',
+              '&:hover': {
+                color: 'primary.dark',
+                backgroundColor: 'action.hover',
+                borderRadius: 1,
+                px: 0.5,
+              },
+            }}
+          >
+            <CellWithTooltipCopy
+              value={value}
+              props={{ displayLength: 16 }}
+            />
+          </Box>
+        );
+      },
+    },
+    {
       field: 'dynamic_reward',
       headerName: '动态奖',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.dynamic_reward || '-'} />,
-    },
-    {
-      field: 'ip',
-      headerName: 'IP地址',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.ip || '-'} />,
-    },
-    {
-      field: 'level',
-      headerName: '等级',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.level || '-'} />,
-    },
-    {
-      field: 'level_up_reward',
-      headerName: '晋级奖励',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.level_up_reward || '-'} />,
-    },
-    {
-      field: 'parent_id',
-      headerName: '上级id',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.parent_id || '-'} />,
-    },
-    {
-      field: 'power',
-      headerName: '算力',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.power || '-'} />,
-    },
-    {
-      field: 'receive_reward',
-      headerName: '已领取奖励',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward || '-'} />,
-    },
-    {
-      field: 'receive_reward_usdt',
-      headerName: '已领取奖励usdt价值',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward_usdt || '-'} />,
-    },
-    {
-      field: 'remark',
-      headerName: '备注',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
     },
     {
       field: 'static_reward',
@@ -696,16 +691,46 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.static_reward || '-'} />,
     },
     {
+      field: 'level_up_reward',
+      headerName: '晋级奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.level_up_reward || '-'} />,
+    },
+    {
+      field: 'receive_reward_usdt',
+      headerName: '已领取奖励usdt价值',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward_usdt || '-'} />,
+    },
+    {
+      field: 'receive_reward',
+      headerName: '已领取奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward || '-'} />,
+    },
+    {
+      field: 'withdraw_limit',
+      headerName: '提现额度',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.withdraw_limit || '-'} />,
+    },
+    {
+      field: 'level',
+      headerName: '等级',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.level || '-'} />,
+    },
+    {
+      field: 'power',
+      headerName: '算力',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.power || '-'} />,
+    },
+    {
       field: 'team_power',
       headerName: '团队算力',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power || '-'} />,
-    },
-    {
-      field: 'team_usdt_recharge_amount',
-      headerName: '团队USDT充值数量',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_usdt_recharge_amount || '-'} />,
     },
     {
       field: 'usdt_recharge_amount',
@@ -714,10 +739,22 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.usdt_recharge_amount || '-'} />,
     },
     {
-      field: 'withdraw_limit',
-      headerName: '提现额度',
+      field: 'team_usdt_recharge_amount',
+      headerName: '团队USDT充值数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.withdraw_limit || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_usdt_recharge_amount || '-'} />,
+    },
+    {
+      field: 'ip',
+      headerName: 'IP地址',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.ip || '-'} />,
+    },
+    {
+      field: 'remark',
+      headerName: '备注',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
     },
     {
       type: 'actions',
@@ -783,7 +820,7 @@ export function UserListView(props: { h: boolean }) {
                 fullWidth
                 value={filtersForEdit.state.address}
                 onChange={handleFilterAddress}
-                placeholder="请输入地址"
+                placeholder="请输入上级地址"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
