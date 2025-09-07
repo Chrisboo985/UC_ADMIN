@@ -17,21 +17,21 @@ import { Iconify } from 'src/components/iconify';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { Form, Field } from 'src/components/hook-form';
+import { type UserTypeItem } from '../user/view/user-list-view.types'
+import {
+  UserType
+} from 'src/api/user';
 
 // ----------------------------------------------------------------------
 
 export type AddressFormType = zod.infer<typeof AddressFormSchema>;
 
 const createAddressFormSchema = (needSurety: boolean) => zod.object({
-  new_address: zod.string(),
-  surety: needSurety 
-    ? zod.string().min(1, { message: '担保人信息不能为空' })
-    : zod.string().optional(),
+  type: zod.string()
 });
 
 export const AddressFormSchema = zod.object({
-  new_address: zod.string(),
-  surety: zod.string().optional(),
+  type: zod.string(),
 });
 
 // ----------------------------------------------------------------------
@@ -39,22 +39,22 @@ export const AddressFormSchema = zod.object({
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmitSuccess: (data: { id: number; new_address: string; surety: string }) => void;
+  onSubmitSuccess: (data: { member_id: number; type: UserType; }) => void;
   currentUser: IUserItemforlist;
+  items: UserTypeItem[];
 };
 
-export function AddressForm({ currentUser, open, onClose, onSubmitSuccess }: Props) {
+export function AddressForm({ currentUser, open, onClose, onSubmitSuccess, items }: Props) {
   // 判断是否需要显示担保人输入框（等级5或以上不需要）
   const needSurety = !currentUser.calc_level || currentUser.calc_level < 5;
 
   const dynamicSchema = createAddressFormSchema(needSurety);
-  
+
   const methods = useForm<AddressFormType>({
     mode: 'all',
     resolver: zodResolver(dynamicSchema),
     defaultValues: {
-      new_address: '',
-      surety: '',
+      type: currentUser.type as unknown as UserType,
     },
   });
 
@@ -67,11 +67,10 @@ export function AddressForm({ currentUser, open, onClose, onSubmitSuccess }: Pro
   const onSubmit = handleSubmit(async (data) => {
     try {
       const submitData = {
-        id: currentUser.id!,
-        new_address: data.new_address,
-        surety: needSurety && data.surety ? data.surety : '',
+        member_id: currentUser.id!,
+        type: data.type as UserType,
       };
-      
+
       onSubmitSuccess(submitData);
       reset();
     } catch (error) {
@@ -89,55 +88,23 @@ export function AddressForm({ currentUser, open, onClose, onSubmitSuccess }: Pro
   return (
     <>
       <DialogTitle sx={{ minHeight: 60, }}>
-        地址换绑
+        设置用户类型
       </DialogTitle>
-      
+
       <DialogContent sx={{ p: 2, pb: 0, display: 'flex', flexDirection: 'column', minHeight: 100 }}>
         <Form methods={methods} onSubmit={onSubmit}>
           <Stack spacing={2} sx={{ flex: 1 }}>
-            <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                当前地址
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontFamily: 'monospace',
-                  bgcolor: 'grey.100',
-                  p: 1,
-                  borderRadius: 1,
-                  wordBreak: 'break-all',
-                  fontSize: '0.875rem'
-                }}
-              >
-                {currentUser.address || '未设置'}
-              </Typography>
-            </Box>
-            
-            <Field.Text
-              name="new_address"
-              label="新地址（留空解绑）"
-              type="text"
-              placeholder="输入新地址或留空解绑"
-            />
-            
-            {needSurety && (
-              <Field.Text
-                name="surety"
-                label="担保人"
-                placeholder="请输入担保人编码或地址"
-                required={needSurety}
-              />
-            )}
+            <Field.RadioGroup row name="type" options={ items }>
+            </Field.RadioGroup>
           </Stack>
-                
+
           <DialogActions sx={{ px: 0, pb: 2, mt: 'auto' }}>
             <Button variant="outlined" onClick={handleClose}>
               取消
             </Button>
-            <LoadingButton 
-              type="submit" 
-              variant="contained" 
+            <LoadingButton
+              type="submit"
+              variant="contained"
               loading={isSubmitting}
             >
               确认

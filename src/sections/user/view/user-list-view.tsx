@@ -86,7 +86,10 @@ import {
   confrimNodeSubscriptionAPI,
   type ConfirmNodeSubscriptionRequest,
   getMemberListAPI,
-  type getMemberListAPIResponse
+  type getMemberListAPIResponse,
+  UserType,
+  getMemberListReqeust,
+  setUserTypeAPI
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -96,6 +99,8 @@ import { AddressForm } from '../address-form';
 import { CapitalFlowForm } from '../capital-flow-form';
 import { ChangeSuperiorForm } from '../change-superior-form';
 import { SetLevelForm } from '../set-level-form';
+import { type UserTypeItem } from './user-list-view.types'
+
 // ----------------------------------------------------------------------
 // 筛选常量
 const HIDE_COLUMNS = { category: false };
@@ -103,6 +108,12 @@ const HIDE_COLUMNS = { category: false };
 const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 
 type Row = getMemberListAPIResponse['list'][number] & { $parentAddress: string | undefined; }
+
+const userTypeItems: UserTypeItem[] = [
+  { label: '全部', value: UserType.All },
+  { label: '普通用户', value: UserType.Normal },
+  { label: '社区用户', value: UserType.Community }
+]
 
 // ----------------------------------------------------------------------
 
@@ -114,14 +125,9 @@ export function UserListView(props: { h: boolean }) {
 
   const confirm = useBoolean();
 
-  const filters = useSetState<IUserTableFiltersForList>({
+  const filters = useSetState<getMemberListReqeust>({
     address: '',
-    created_at_end: undefined,
-    created_at_start: undefined,
-    h_username: '',
-    member_code: '',
-    is_business: undefined,
-    parent_code: undefined
+    type: UserType.All,
   });
 
   const filtersForEdit = useSetState<{
@@ -132,6 +138,7 @@ export function UserListView(props: { h: boolean }) {
     member_code?: string;
     is_business?: boolean;
     parent_code?: string;
+    type: UserType;
   }>({
     address: '',
     created_at_end: undefined,
@@ -140,6 +147,7 @@ export function UserListView(props: { h: boolean }) {
     member_code: '',
     is_business: undefined,
     parent_code: undefined,
+    type: UserType.All,
   });
 
   // 过滤数据
@@ -212,6 +220,9 @@ export function UserListView(props: { h: boolean }) {
       page_size: pagination.pageSize,
     };
 
+    // @ts-ignore
+    if (params.type === UserType.All) params.type = ''
+
     console.log('params', params);
 
     setUsersLoading(true);
@@ -251,12 +262,7 @@ export function UserListView(props: { h: boolean }) {
     // 只保留接口支持的搜索参数
     filters.setState({
       address: filtersForEdit.state.address,
-      created_at_end: filtersForEdit.state.created_at_end,
-      created_at_start: filtersForEdit.state.created_at_start,
-      h_username: filtersForEdit.state.h_username,
-      member_code: filtersForEdit.state.member_code,
-      is_business: filtersForEdit.state.is_business,
-      parent_code: filtersForEdit.state.parent_code,
+      type: filtersForEdit.state.type
     });
   };
 
@@ -318,6 +324,14 @@ export function UserListView(props: { h: boolean }) {
     setOpenResetPasswordDialog(true);
   }, []);
 
+  // 设置用户类型
+  const setUserType = useCallback((user: IUserItemforlist) => {
+    setCurrentUserForAddress(user);
+    setOpenAddressDialog(true);
+  }, []);
+
+
+
   // 更绑地址
   const handleAddress = useCallback((user: IUserItemforlist) => {
     setCurrentUserForAddress(user);
@@ -329,16 +343,20 @@ export function UserListView(props: { h: boolean }) {
     setCurrentUserForAddress(null);
   }, []);
   // 提交更绑地址
-  const handleSubmitAddress = useCallback(async (data: { id: number; new_address: string; surety: string }) => {
-    const toastId = toast.loading('正在更绑地址...');
+  const handleSubmitAddress = useCallback(async (data: { member_id: number; type: UserType; }) => {
+    const _data = data
+
+    // @ts-ignore
+    if (_data.type === UserType.All) _data.type = ''
+    const toastId = toast.loading('正在修改用户类型...');
     try {
-      const response = await updateMemberAddressAPI(data);
+      const response = await setUserTypeAPI(_data);
       if (response.code === 0) {
-        toast.success('地址更绑成功');
+        toast.success('修改用户类型成功');
         handleCloseAddressDialog();
         getList(); // 刷新列表
       } else {
-        toast.error(response.message || '地址更绑失败');
+        toast.error(response.message || '修改用户类型失败');
       }
     } catch (error) {
       toast.error('操作失败');
@@ -721,6 +739,18 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.level || '-'} />,
     },
     {
+      field: 'type',
+      headerName: '用户类型',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={ userTypeItems.find(item => item.value === params.row.type)?.label || '-'} />,
+    },
+    {
+      field: 'community_usdt_recharge_amount',
+      headerName: '社区usdt充值业绩',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_usdt_recharge_amount  || '-'} />,
+    },
+    {
       field: 'power',
       headerName: '算力',
       minWidth: 170,
@@ -779,6 +809,14 @@ export function UserListView(props: { h: boolean }) {
           onClick={() => handleResetPassword(params.row)}
           disabled={false}
         />,
+        // 设置用户类型
+        <GridActionsCellItem
+          showInMenu
+          icon={<Iconify icon="mdi:currency-usd" />}
+          label="设置用户类型"
+          onClick={() => setUserType(params.row)}
+          disabled={false}
+        />,
       ],
     },
   ];
@@ -787,6 +825,13 @@ export function UserListView(props: { h: boolean }) {
     columns
       .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
       .map((column) => column.field);
+
+  const handleUserTypeFilter = React.useCallback(
+    (type: UserType) => {
+      filtersForEdit.setState({ type });
+    },
+    [filtersForEdit]
+  )
 
   return (
     <>
@@ -829,6 +874,23 @@ export function UserListView(props: { h: boolean }) {
                   ),
                 }}
               />
+            </FormControl>
+            <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={ filtersForEdit.state.type }
+                label="Age"
+                onChange={(e) => handleUserTypeFilter(e.target.value as UserType)}
+              >
+                {
+                  userTypeItems.map(({ label, value }) => (
+                    <MenuItem key={ value } value={ value }>
+                      { label }
+                    </MenuItem>
+                  ))
+                }
+              </Select>
             </FormControl>
             <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
               <Button variant="contained" onClick={handleFilterData}>
@@ -931,7 +993,7 @@ export function UserListView(props: { h: boolean }) {
           />
         </Dialog>
       )}
-      {/* 更绑地址对话框 */}
+      {/* 设置用户类型弹窗 */}
       {currentUserForAddress && (
         <Dialog
           fullWidth
@@ -947,12 +1009,12 @@ export function UserListView(props: { h: boolean }) {
               display: 'flex',
               overflow: 'hidden',
               flexDirection: 'column',
-              minHeight: '40vh',
               '& form': { minHeight: 0, display: 'flex', flex: '1 1 auto', flexDirection: 'column' },
             },
           }}
         >
           <AddressForm
+            items={ userTypeItems }
             currentUser={currentUserForAddress}
             open={openAddressDialog}
             onClose={handleCloseAddressDialog}

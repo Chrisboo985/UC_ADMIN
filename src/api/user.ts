@@ -951,7 +951,22 @@ export type getNodeSubscriptionLogListResponse = {
 
 export const getNodeSubscriptionLogListAPI = (data: getNodeSubscriptionLogListRequest) => axios.post<getNodeSubscriptionLogListResponse>('/admin/admin_log/node_purchase_log_list', data)
 
-export type getMemberListReqeust = {}
+export type getMemberListReqeust = {
+  address: string;
+  type: UserType;
+}
+
+/** 用户类型 */
+export const enum UserType {
+  /** 全部 */
+  All = 'all',
+
+  /** 普通用户 */
+  Normal = 'normal',
+
+  /** 社区用户 */
+  Community = 'community'
+}
 
 export type getMemberListAPIResponse = {
   list: Array<{
@@ -972,11 +987,19 @@ export type getMemberListAPIResponse = {
     team_usdt_recharge_amount: number;
     usdt_recharge_amount: number;
     withdraw_limit: number;
+    type: UserType;
   }>;
   total: number;
 }
 
 export const getMemberListAPI = (data: getMemberListReqeust) => axios.post<getMemberListAPIResponse>('/admin/member/list', data)
+
+export type setUserTypeRequest = {
+  member_id: number;
+  type: UserType;
+}
+
+export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/member/set_type', data)
 
 
 
