@@ -839,8 +839,12 @@ export function UserListView(props: { h: boolean }) {
         <CustomBreadcrumbs
           heading="会员列表"
           links={[
-            { name: '数据概览', href: paths.dashboard.root },
-            { name: '会员', href: paths.dashboard.user.root },
+            { name: '数据概览', 
+              // href: paths.dashboard.root 
+            },
+            { name: '会员', 
+              // href: paths.dashboard.user.root 
+            },
             { name: '会员列表' },
           ]}
           sx={{ mb: { xs: 3, md: 5 } }}
