@@ -111,15 +111,6 @@ export const navData = [
       },
 
       {
-        title: '日志',
-        path: paths.dashboard.log.root,
-        icon: ICONS.menuItem,
-        children: [
-          { title: '节点认购', path: paths.dashboard.log.nodeSubscription },
-        ],
-      },
-
-      {
         title: '充值',
         path: paths.dashboard.recharge.root,
         icon: ICONS.invoice,
@@ -158,6 +149,14 @@ export const navData = [
           // { title: '债券销售记录', path: paths.dashboard.financialConsole.bondSalesRecords },
           // { title: '债券分红流水', path: paths.dashboard.financialConsole.bondBonusIndex },
           { title: '认购节点记录', path: paths.dashboard.financialConsole.nodeOrderList },
+        ],
+      },
+      {
+        title: '日志',
+        path: paths.dashboard.log.root,
+        icon: ICONS.menuItem,
+        children: [
+          { title: '节点认购', path: paths.dashboard.log.nodeSubscription },
         ],
       },
       // {
