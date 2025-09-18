@@ -279,28 +279,28 @@ export const getTgameTeamBonusAPI = () =>
 
 
 
-  
+
 /**
  * ksp - 质押数据
  * /admin/outline/pledge
  */
 export const getKspPledgeAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       bond_pledge: number;
       stake_pledge: number;
       total_pledge: number;
      } }
   >('/admin/outline/pledge');
 
-  
+
 /**
  * ksp - rebase奖励数据
  * /admin/outline/rebase
  */
 export const getKspRebaseAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_rebase_reward: number;
       today_rebase_reward: number;
       week_rebase_reward: number;
@@ -314,7 +314,7 @@ export const getKspRebaseAPI = () =>
  */
 export const getKspMemberAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_new_members: number;
       today_new_members: number;
       total_members: number;
@@ -329,7 +329,7 @@ export const getKspMemberAPI = () =>
  */
 export const getKspLadderRewardAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_ladder_reward: number,
       today_ladder_reward: number,
       week_ladder_reward: number
@@ -337,7 +337,7 @@ export const getKspLadderRewardAPI = () =>
   >('/admin/outline/ladder_reward');
 /**
  * ksp - 债券销售奖励数据
- * /admin/outline/bond_sell_reward 
+ * /admin/outline/bond_sell_reward
  * type AdminBondSellRewardRes struct {
  *    TotalReward              decimal.Decimal json:"total_reward"                // 债券销售总奖励
  *    AvailableReward          decimal.Decimal json:"available_reward"            // 债券销售可领取奖励
@@ -347,7 +347,7 @@ export const getKspLadderRewardAPI = () =>
  */
 export const getKspBondSellRewardAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       total_reward: number,
       available_reward: number,
       received_reward: number,
@@ -356,13 +356,13 @@ export const getKspBondSellRewardAPI = () =>
   >('/admin/outline/bond_sell_reward');
 
 
-/** 
+/**
  * ksp - 分叉债券认购(USDT单位)
  * /admin/outline/bond_offer_buy_ksp
 */
 export const getKspBondOfferBuyStatsUSDTAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
     /**
      * 今日LP债券认购金额
      */
@@ -388,7 +388,7 @@ export const getKspBondOfferBuyStatsUSDTAPI = () =>
  */
 export const getKspInviteRewardAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_invite_reward: number,
       today_invite_reward: number,
       week_invite_reward: number;
@@ -403,7 +403,7 @@ export const getKspInviteRewardAPI = () =>
  */
 export const getKspIncrCommunityRewardAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_incr_community_reward: number,
       today_incr_community_reward: number,
       week_incr_community_reward: number;
@@ -419,7 +419,7 @@ export const getKspIncrCommunityRewardAPI = () =>
  */
 export const getKspCommunityRewardAPI = () =>
   axios.post<
-    BaseResponse & { data?: { 
+    BaseResponse & { data?: {
       month_community_reward: number,
       today_community_reward: number,
       week_community_reward: number;
@@ -468,7 +468,7 @@ export const getKspBondOfferBuyAPI = () =>
       "total_lp_bond_amount": number,
       "total_treasury_amount": number
     } }
-  
+
   >('/admin/outline/bond_offer_buy');
 
 /**
@@ -477,6 +477,6 @@ export const getKspBondOfferBuyAPI = () =>
  */
 export const getAdminOutlineAllAPI = () =>
   axios.post<BaseResponse & { data?: import('../sections/lgns/app/view/api').ApifoxModel }>(
-    '/admin/outline/all'
+    '/admin/outline/all_data'
   );
 

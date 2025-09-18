@@ -15,6 +15,8 @@ const ROOTS = {
   ADMIN: '/admin',
 };
 
+console.log(`${ROOTS.DASHBOARD}/log/node-subscription`)
+
 // ----------------------------------------------------------------------
 
 export const paths = {
@@ -189,7 +191,11 @@ export const paths = {
     },
     log: {
       root: `${ROOTS.DASHBOARD}/log/list`,
-      nodeSubscription:  `${ROOTS.DASHBOARD}/log/nodeSubscription`
+      nodeSubscription:  `${ROOTS.DASHBOARD}/log/node-subscription`
+    },
+    recharge: {
+      root: `${ROOTS.DASHBOARD}/recharge/list`,
+      rechargeList:  `${ROOTS.DASHBOARD}/recharge/recharge-list`
     },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,

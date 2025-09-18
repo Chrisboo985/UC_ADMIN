@@ -763,10 +763,22 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power || '-'} />,
     },
     {
+      field: 'order_count',
+      headerName: '节点认购数量',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.order_count || '-'} />,
+    },
+    {
       field: 'usdt_recharge_amount',
       headerName: 'USDT充值数量',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.usdt_recharge_amount || '-'} />,
+    },
+    {
+      field: 'network_order_count',
+      headerName: '团队节点认购数量',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.network_order_count || '-'} />,
     },
     {
       field: 'team_usdt_recharge_amount',
@@ -839,11 +851,11 @@ export function UserListView(props: { h: boolean }) {
         <CustomBreadcrumbs
           heading="会员列表"
           links={[
-            { name: '数据概览', 
-              // href: paths.dashboard.root 
+            { name: '管理',
+              // href: paths.dashboard.root
             },
-            { name: '会员', 
-              // href: paths.dashboard.user.root 
+            { name: '会员',
+              // href: paths.dashboard.user.root
             },
             { name: '会员列表' },
           ]}

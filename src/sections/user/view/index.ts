@@ -17,3 +17,5 @@ export { ParentModifyLogView } from './parent-modify-log-view';
 export { TransferLogView } from './transfer-log-view';
 
 export * from './node-subscription-view'
+
+export * from './recharge-list-view'

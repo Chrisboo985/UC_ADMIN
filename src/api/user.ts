@@ -1,4 +1,5 @@
 import { axiosForApi } from 'src/utils/axios';
+import type { IDatePickerControl } from 'src/types/common';
 
 const axios = axiosForApi;
 
@@ -1000,6 +1001,28 @@ export type setUserTypeRequest = {
 }
 
 export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/member/set_type', data)
+
+
+export const getRechargeList = (data: {
+  created_at_start: number | null;
+  created_at_end: number | null;
+  member_address: string;
+  page: number;
+  page_size: number;
+}) => axios.post<{
+  list: Array<{
+    address: string;
+    amount: string;
+    created_at_string: string;
+    deposit_address: string;
+    remark: string;
+    transaction_hash: string;
+    transaction_id: string;
+    chain_id: string;
+    token_id: string;
+  }>;
+  total: number;
+}>('/admin/deposit_record/list', data)
 
 
 

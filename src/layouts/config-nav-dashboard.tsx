@@ -12,6 +12,8 @@ const icon = (name: string) => (
   <SvgColor src={`${CONFIG.assetsDir}/assets/icons/navbar/${name}.svg`} />
 );
 
+console.log(`${CONFIG.assetsDir}/assets/icons/navbar/${'ic-job'}.svg`)
+
 const ICONS = {
   job: icon('ic-job'),
   blog: icon('ic-blog'),
@@ -47,28 +49,28 @@ export const navData = [
   /**
    * Overview
    */
-  // {
-  //   subheader: '数据',
-  //   items: [
-  //     {
-  //       title: '数据概览统计',
-  //       path: paths.dashboard.root,
-  //       icon: ICONS.dashboard,
-  //     },
-  //     {
-  //       title: 'TGAME概览',
-  //       path: paths.dashboard.tGame,
-  //       icon: ICONS.kanban,
-  //     },
-  //     { title: '概览', path: paths.dashboard.root, icon: ICONS.dashboard },
-  //     { title: 'Ecommerce', path: paths.dashboard.general.ecommerce, icon: ICONS.ecommerce },
-  //     { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
-  //     { title: 'Banking', path: paths.dashboard.general.banking, icon: ICONS.banking },
-  //     { title: 'Booking', path: paths.dashboard.general.booking, icon: ICONS.booking },
-  //     { title: 'File', path: paths.dashboard.general.file, icon: ICONS.file },
-  //     { title: 'Course', path: paths.dashboard.general.course, icon: ICONS.course },
-  //   ],
-  // },
+  {
+    subheader: '数据',
+    items: [
+      // {
+      //   title: '数据概览统计',
+      //   path: paths.dashboard.root,
+      //   icon: ICONS.dashboard,
+      // },
+      // {
+      //   title: 'TGAME概览',
+      //   path: paths.dashboard.tGame,
+      //   icon: ICONS.kanban,
+      // },
+      { title: '概览', path: paths.dashboard.root, icon: ICONS.dashboard },
+      // { title: 'Ecommerce', path: paths.dashboard.general.ecommerce, icon: ICONS.ecommerce },
+      // { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
+      // { title: 'Banking', path: paths.dashboard.general.banking, icon: ICONS.banking },
+      // { title: 'Booking', path: paths.dashboard.general.booking, icon: ICONS.booking },
+      // { title: 'File', path: paths.dashboard.general.file, icon: ICONS.file },
+      // { title: 'Course', path: paths.dashboard.general.course, icon: ICONS.course },
+    ],
+  },
   /**
    * Management
    */
@@ -105,9 +107,18 @@ export const navData = [
       {
         title: '日志',
         path: paths.dashboard.log.root,
-        icon: ICONS.user,
+        icon: ICONS.menuItem,
         children: [
           { title: '节点认购', path: paths.dashboard.log.nodeSubscription },
+        ],
+      },
+
+      {
+        title: '充值',
+        path: paths.dashboard.recharge.root,
+        icon: ICONS.invoice,
+        children: [
+          { title: '充值列表', path: paths.dashboard.recharge.rechargeList },
         ],
       },
 
@@ -117,18 +128,18 @@ export const navData = [
       //   icon: ICONS.product,
       //   children: [
       //     // { title: '概览', path: paths.dashboard.lgns.overviewAnalyticsView },
-      //     // { title: '债券合约管理', path: paths.dashboard.lgns.contractManagement },
+      //     { title: '债券合约管理', path: paths.dashboard.lgns.contractManagement },
       //     { title: '配置管理', path: paths.dashboard.lgns.configManagement },
-      //     // { title: '质押合约管理', path: paths.dashboard.lgns.pledgeManagement },
-      //     // { title: 'Rebase日志列表', path: paths.dashboard.lgns.rebaseRecord },
-      //     // { title: 'NFT合约管理', path: paths.dashboard.lgns.nftContractManagement },
-      //     // { title: 'NFT空投记录', path: paths.dashboard.lgns.nftAirdropFlow },
-      //     // { title: 'DAO日志列表', path: paths.dashboard.lgns.daoRecord },
+      //     { title: '质押合约管理', path: paths.dashboard.lgns.pledgeManagement },
+      //     { title: 'Rebase日志列表', path: paths.dashboard.lgns.rebaseRecord },
+      //     { title: 'NFT合约管理', path: paths.dashboard.lgns.nftContractManagement },
+      //     { title: 'NFT空投记录', path: paths.dashboard.lgns.nftAirdropFlow },
+      //     { title: 'DAO日志列表', path: paths.dashboard.lgns.daoRecord },
       //     { title: '合约任务列表', path: paths.dashboard.lgns.contractTask },
-      //     // { title: '社区分红', path: paths.dashboard.lgns.communitDividends },
-      //     // { title: '层级分红', path: paths.dashboard.lgns.tierDividend },
-      //     // { title: 'Rebase操作队列', path: paths.dashboard.lgns.rebaseOperationQueue },
-      //     // { title: '质押排名', path: paths.dashboard.lgns.stakingRanking },
+      //     { title: '社区分红', path: paths.dashboard.lgns.communitDividends },
+      //     { title: '层级分红', path: paths.dashboard.lgns.tierDividend },
+      //     { title: 'Rebase操作队列', path: paths.dashboard.lgns.rebaseOperationQueue },
+      //     { title: '质押排名', path: paths.dashboard.lgns.stakingRanking },
       //   ],
       // },
       // {

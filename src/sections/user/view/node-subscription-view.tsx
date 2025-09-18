@@ -728,11 +728,11 @@ export function NodeSubscriptionView(props: { h: boolean }) {
         <CustomBreadcrumbs
           heading="节点认购"
           links={[
-            { name: '数据概览', 
-              // href: paths.dashboard.root 
+            { name: '管理',
+              // href: paths.dashboard.root
             },
             { name: '日志',
-              // href: paths.dashboard.log.root 
+              // href: paths.dashboard.log.root
             },
             { name: '节点认购' },
           ]}
