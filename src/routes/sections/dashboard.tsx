@@ -167,6 +167,9 @@ const NftAirdropFlowView = lazy(() => import('src/pages/dashboard/lgns/NFTAirdro
 /** Log */
 const NodeSubscriptionLogPage = lazy(() => import('src/pages/dashboard/log/list'));
 const NodeOrderListPage = lazy(() => import('src/pages/dashboard/log/order-list'));
+
+/** recharge */
+const RechargeListPage = lazy(() => import('src/pages/dashboard/recharge/list'));
 // ----------------------------------------------------------------------
 
 const BondBuyView = lazy(() => import('src/pages/dashboard/communityGovernance/bondBuy'));
@@ -203,33 +206,39 @@ export const dashboardRoutes = [
         path: 'user',
         children: [
           { element: <UserListPage />, index: true },
-          { path: 'profile', element: <UserProfilePage /> },
-          { path: 'cards', element: <UserCardsPage /> },
+          // { path: 'profile', element: <UserProfilePage /> },
+          // { path: 'cards', element: <UserCardsPage /> },
           { title: '会员列表', path: 'list', element: <UserListPage /> },
-          { title: '会员列表', path: 'h-list', element: <UserList2Page /> },
-          { title: '网体结构', path: 'organizationalChart', element: <OrganizationalChart /> },
-          { title: '查询上级', path: 'parent-list', element: <ParentListPage /> },
-          { title: '查询修改推荐人记录', path: 'parent-modify-log', element: <ParentModifyLogPage /> },
-          { title: '转账记录查询', path: 'transfer-log', element: <TransferLogPage /> },
-          { title: '社区业绩', path: 'performance-list', element: <PerformanceList /> },
-          { title: '社区链上出入金', path: 'performance-swap', element: <PerformanceSwap /> },
-          { title: '社区债券购买记录', path: 'performance-bond-purchase', element: <PerformanceBondPurchase /> },
-          { title: '社区债券购买汇总', path: 'performance-bond-purchase-gather', element: <PerformanceBondPurchaseGather /> },
-          { title: '社区出入金汇总', path: 'performance-bond-with-swap', element: <PerformanceBondWithSwap /> },
-          { title: '社区奖励查询', path: 'communityRewardQuery', element: <CommunityRewardQueryPage /> },
-          { path: 'communityRewardList', element: <CommunityRewardListPage /> },
-          { title: '团队业绩查询', path: 'teamPerformanceInquiry', element: <TeamPerformanceInquiryPage /> },
-          { path: 'new', element: <UserCreatePage /> },
-          { path: ':id/edit', element: <UserEditPage /> },
-          { path: 'account', element: <UserAccountPage /> },
+          // { title: '会员列表', path: 'h-list', element: <UserList2Page /> },
+          // { title: '网体结构', path: 'organizationalChart', element: <OrganizationalChart /> },
+          // { title: '查询上级', path: 'parent-list', element: <ParentListPage /> },
+          // { title: '查询修改推荐人记录', path: 'parent-modify-log', element: <ParentModifyLogPage /> },
+          // { title: '转账记录查询', path: 'transfer-log', element: <TransferLogPage /> },
+          // { title: '社区业绩', path: 'performance-list', element: <PerformanceList /> },
+          // { title: '社区链上出入金', path: 'performance-swap', element: <PerformanceSwap /> },
+          // { title: '社区债券购买记录', path: 'performance-bond-purchase', element: <PerformanceBondPurchase /> },
+          // { title: '社区债券购买汇总', path: 'performance-bond-purchase-gather', element: <PerformanceBondPurchaseGather /> },
+          // { title: '社区出入金汇总', path: 'performance-bond-with-swap', element: <PerformanceBondWithSwap /> },
+          // { title: '社区奖励查询', path: 'communityRewardQuery', element: <CommunityRewardQueryPage /> },
+          // { path: 'communityRewardList', element: <CommunityRewardListPage /> },
+          // { title: '团队业绩查询', path: 'teamPerformanceInquiry', element: <TeamPerformanceInquiryPage /> },
+          // { path: 'new', element: <UserCreatePage /> },
+          // { path: ':id/edit', element: <UserEditPage /> },
+          // { path: 'account', element: <UserAccountPage /> },
         ],
       },
       {
         path: 'log',
         children: [
           { element: <NodeSubscriptionLogPage />, index: true },
-          { title: '节点认购', path: 'nodeSubscription', element: <NodeSubscriptionLogPage /> },
-          
+          { title: '节点认购', path: 'node-subscription', element: <NodeSubscriptionLogPage /> },
+        ],
+      },
+      {
+        path: 'recharge',
+        children: [
+          { element: <RechargeListPage />, index: true },
+          { title: '充值列表', path: 'recharge-list', element: <RechargeListPage /> },
         ],
       },
       {

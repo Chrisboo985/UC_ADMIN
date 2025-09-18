@@ -1,6 +1,4 @@
-import type { IUserTableFiltersForList } from 'src/types/user';
 import type { Theme, SxProps } from '@mui/material/styles';
-import type { UseSetStateReturn } from 'src/hooks/use-set-state';
 
 import { useCallback } from 'react';
 

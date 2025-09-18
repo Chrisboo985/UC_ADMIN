@@ -161,8 +161,353 @@ export function OverviewAppView() {
         unit: 'USD1',
         color: 'secondary',
       },
-    ]
+    ],
 
+    // memberData: [
+    //   {
+    //     title: '今日新增会员',
+    //     total: apiData?.admin_member_res?.today_new_members || '0',
+    //     unit: '个',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周新增会员',
+    //     total: apiData?.admin_member_res?.week_new_members || '0',
+    //     unit: '个',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月新增会员',
+    //     total: apiData?.admin_member_res?.month_new_members || '0',
+    //     unit: '个',
+    //     color: 'success',
+    //   },
+    //   {
+    //     title: '总会员',
+    //     total: apiData?.admin_member_res?.total_members || '0',
+    //     unit: '个',
+    //     color: 'error',
+    //   },
+    // ],
+    //     // 8. 矿机统计数据
+    // powerLogData: [
+    //   {
+    //     title: '今日矿机购买',
+    //     total: apiData?.admin_power_log_res?.today_purchase || '0',
+    //     unit: '',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周矿机购买',
+    //     total: apiData?.admin_power_log_res?.week_purchase || '0',
+    //     unit: '',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月矿机购买',
+    //     total: apiData?.admin_power_log_res?.month_purchase || '0',
+    //     unit: '',
+    //     color: 'success',
+    //   },
+    //   {
+    //     title: '矿机总计',
+    //     total: apiData?.admin_power_log_res?.total_purchase || '0',
+    //     unit: '',
+    //     color: 'error',
+    //   },
+    // ],
+    // 1. 代数奖励APD数据
+    algebraRewardApdData: [
+      {
+        title: '今日充值总额',
+        total: apiData?.deposit_data?.today_forward_amount || '0',
+        unit: '',
+        color: 'primary',
+      },
+      {
+        title: '本周充值总额',
+        total: apiData?.deposit_data?.week_forward_amount || '0',
+        unit: '',
+        color: 'secondary',
+      },
+      {
+        title: '本月充值总额',
+        total: apiData?.deposit_data?.month_forward_amount || '0',
+        unit: '',
+        color: 'success',
+      },
+      {
+        title: '总充值总额',
+        total: apiData?.deposit_data?.total_forward_amount || '0',
+        unit: '',
+        color: 'success',
+      },
+    ],
+
+    // // 2. 代数奖励CP数据
+    // algebraRewardCpData: [
+    //   {
+    //     title: '今日代数奖励CP',
+    //     total: apiData?.admin_algebra_reward_cp_res?.today_profit || '0',
+    //     unit: 'CP',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周代数奖励CP',
+    //     total: apiData?.admin_algebra_reward_cp_res?.week_profit || '0',
+    //     unit: 'CP',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月代数奖励CP',
+    //     total: apiData?.admin_algebra_reward_cp_res?.month_profit || '0',
+    //     unit: 'CP',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 3. 极差奖励APD数据
+    // diffRewardApdData: [
+    //   {
+    //     title: '今日极差奖励APD',
+    //     total: apiData?.admin_diff_reward_apd_res?.today_profit || '0',
+    //     unit: 'APD',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周极差奖励APD',
+    //     total: apiData?.admin_diff_reward_apd_res?.week_profit || '0',
+    //     unit: 'APD',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月极差奖励APD',
+    //     total: apiData?.admin_diff_reward_apd_res?.month_profit || '0',
+    //     unit: 'APD',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 4. 极差奖励CP数据
+    // diffRewardCpData: [
+    //   {
+    //     title: '今日极差奖励CP',
+    //     total: apiData?.admin_diff_reward_cp_res?.today_profit || '0',
+    //     unit: 'CP',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周极差奖励CP',
+    //     total: apiData?.admin_diff_reward_cp_res?.week_profit || '0',
+    //     unit: 'CP',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月极差奖励CP',
+    //     total: apiData?.admin_diff_reward_cp_res?.month_profit || '0',
+    //     unit: 'CP',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 5. 升级奖励APD数据
+    // levelUpApdData: [
+    //   {
+    //     title: '今日升级奖励APD',
+    //     total: apiData?.admin_level_up_apd_res?.today_profit || '0',
+    //     unit: 'APD',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周升级奖励APD',
+    //     total: apiData?.admin_level_up_apd_res?.week_profit || '0',
+    //     unit: 'APD',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月升级奖励APD',
+    //     total: apiData?.admin_level_up_apd_res?.month_profit || '0',
+    //     unit: 'APD',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 6. 升级奖励CP数据
+    // levelUpCpData: [
+    //   {
+    //     title: '今日升级奖励CP',
+    //     total: apiData?.admin_level_up_cp_res?.today_profit || '0',
+    //     unit: 'CP',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周升级奖励CP',
+    //     total: apiData?.admin_level_up_cp_res?.week_profit || '0',
+    //     unit: 'CP',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月升级奖励CP',
+    //     total: apiData?.admin_level_up_cp_res?.month_profit || '0',
+    //     unit: 'CP',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 9. 矿机类型统计数据
+    // powerTypeData: [
+    //   {
+    //     title: '今日普卡购买',
+    //     total: apiData?.admin_power_type_normal_res?.today_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周普卡购买',
+    //     total: apiData?.admin_power_type_normal_res?.week_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月普卡购买',
+    //     total: apiData?.admin_power_type_normal_res?.month_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'success',
+    //   },
+    // ],
+    // // 金卡统计数据
+    // goldCardData: [
+    //   {
+    //     title: '今日金卡矿机购买',
+    //     total: apiData?.admin_power_type_gold_res?.today_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周金卡矿机购买',
+    //     total: apiData?.admin_power_type_gold_res?.week_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月金卡矿机购买',
+    //     total: apiData?.admin_power_type_gold_res?.month_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'success',
+    //   },
+    // ],
+
+
+    // // 铂金卡统计数据
+    // diamondCardData: [
+    //   {
+    //     title: '今日铂金卡矿机购买',
+    //     total: apiData?.admin_power_type_diamond_res?.today_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周铂金卡矿机购买',
+    //     total: apiData?.admin_power_type_diamond_res?.week_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月铂金卡矿机购买',
+    //     total: apiData?.admin_power_type_diamond_res?.month_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 黑卡统计数据
+    // blackCardData: [
+    //   {
+    //     title: '今日黑卡矿机购买',
+    //     total: apiData?.admin_power_type_black_res?.today_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周黑卡矿机购买',
+    //     total: apiData?.admin_power_type_black_res?.week_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月黑卡矿机购买',
+    //     total: apiData?.admin_power_type_black_res?.month_power_type_purchase || '0',
+    //     unit: '',
+    //     color: 'success',
+    //   },
+    // ],
+
+
+    // // 10. 挖矿奖励APD数据
+    // rebaseApdData: [
+    //   {
+    //     title: '今日挖矿奖励APD',
+    //     total: apiData?.admin_rebase_apd_res?.today_profit || '0',
+    //     unit: 'APD',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周挖矿奖励APD',
+    //     total: apiData?.admin_rebase_apd_res?.week_profit || '0',
+    //     unit: 'APD',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月挖矿奖励APD',
+    //     total: apiData?.admin_rebase_apd_res?.month_profit || '0',
+    //     unit: 'APD',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 11. 挖矿奖励CP数据
+    // rebaseCpData: [
+    //   {
+    //     title: '今日挖矿奖励CP',
+    //     total: apiData?.admin_rebase_cp_res?.today_profit || '0',
+    //     unit: 'CP',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周挖矿奖励CP',
+    //     total: apiData?.admin_rebase_cp_res?.week_profit || '0',
+    //     unit: 'CP',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月挖矿奖励CP',
+    //     total: apiData?.admin_rebase_cp_res?.month_profit || '0',
+    //     unit: 'CP',
+    //     color: 'success',
+    //   },
+    // ],
+
+    // // 12. 充值TP数据
+    // topUpTpData: [
+    //   {
+    //     title: '今日USDA充值TP返利',
+    //     total: apiData?.admin_top_up_tp_res?.today_profit || '0',
+    //     unit: 'TP',
+    //     color: 'primary',
+    //   },
+    //   {
+    //     title: '本周USDA充值TP返利',
+    //     total: apiData?.admin_top_up_tp_res?.week_profit || '0',
+    //     unit: 'TP',
+    //     color: 'secondary',
+    //   },
+    //   {
+    //     title: '本月USDA充值TP返利',
+    //     total: apiData?.admin_top_up_tp_res?.month_profit || '0',
+    //     unit: 'TP',
+    //     color: 'success',
+    //   },
+    // ],
   };
 
   if (lgnsLoading) {
@@ -182,12 +527,27 @@ export function OverviewAppView() {
   const categoryNameMap: Record<string, string> = {
     member_data: '会员数据',
     order_data: '认购节点数据',
+    algebraRewardApdData: '充值数据',
+    // algebraRewardCpData: '代数奖励CP数据',
+    // diffRewardApdData: '极差奖励APD数据',
+    // diffRewardCpData: '极差奖励CP数据',
+    // levelUpApdData: '升级奖励APD数据',
+    // levelUpCpData: '升级奖励CP数据',
+    // memberData: '用户统计',
+    // powerLogData: '矿机统计',
+    // powerTypeData: '普卡类型统计',
+    // blackCardData: '黑卡类型统计',
+    // diamondCardData: '铂金卡类型统计',
+    // goldCardData: '金卡类型统计',
+    // rebaseApdData: '挖矿APD数据',
+    // rebaseCpData: '挖矿CP数据',
+    // topUpTpData: '充值TP数据',
   };
   return (
     <DashboardContent maxWidth="xl">
       <CustomBreadcrumbs
         heading="概览"
-        links={[{ name: '控制台', href: paths.dashboard.root }, { name: '概览' }]}
+        links={[{ name: '数据' }, { name: '概览' }]}
         sx={{ mb: { xs: 3, md: 3 } }}
       />
       {/* 今日会员 、 活跃会员、总会员 */}
