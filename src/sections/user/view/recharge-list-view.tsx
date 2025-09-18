@@ -39,11 +39,14 @@ import dayjs from 'dayjs';
 import { CustomDateRangePicker } from 'src/components/custom-date-range-picker';
 import { useBoolean } from 'src/hooks/use-boolean';
 import type { IDatePickerControl } from 'src/types/common';
-import { fIsAfter, fDateRangeShortLabel } from 'src/utils/format-time';
+import { fIsAfter } from 'src/utils/format-time';
 
 import Chip from '@mui/material/Chip';
 
 import { chipProps, FiltersBlock, FiltersResult } from 'src/components/filters-result';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { fNumberWithSeparator } from 'src/utils/format-number';
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +70,8 @@ export function RechargeListView(props: { h: boolean }) {
   const openDateRange = useBoolean();
 
   const theme = useTheme();
+
+  const [totalPurchase, setTotalPurchase] = useState<string>('');
 
   const params = useSetState<RechargeListParams>({
     member_address: '',
@@ -104,6 +109,7 @@ export function RechargeListView(props: { h: boolean }) {
           // 如果为空，需要设置默认值
           setFilteredData((data?.list || []));
           setTotalCount(data?.total || 0);
+          setTotalPurchase(data?.total_purchase || '0');
         } else {
           toast.error(apiResult.message);
           setFilteredData([]);
@@ -323,6 +329,14 @@ export function RechargeListView(props: { h: boolean }) {
               </Button>
             </FormControl>
           </Stack>
+          <Box sx={{ px: 2, py: 2 }}>
+            <Stack direction="row" spacing={3} divider={<Box sx={{ height: '60px', borderLeft: 1, borderColor: 'divider' }} />}>
+              <Stack spacing={1}>
+                <Typography variant="subtitle2" color="text.secondary">总购买金额 (USD1)</Typography>
+                <Typography variant="h6">{fNumberWithSeparator(totalPurchase,2)}</Typography>
+              </Stack>
+            </Stack>
+          </Box>
 
           {/* 数据表格，采用服务端管理数据模式 */}
           <DataGrid

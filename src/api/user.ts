@@ -1022,6 +1022,7 @@ export const getRechargeList = (data: {
     token_id: string;
   }>;
   total: number;
+  total_purchase: string;
 }>('/admin/deposit_record/list', data)
 
 
