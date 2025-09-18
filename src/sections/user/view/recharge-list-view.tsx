@@ -332,7 +332,7 @@ export function RechargeListView(props: { h: boolean }) {
           <Box sx={{ px: 2, py: 2 }}>
             <Stack direction="row" spacing={3} divider={<Box sx={{ height: '60px', borderLeft: 1, borderColor: 'divider' }} />}>
               <Stack spacing={1}>
-                <Typography variant="subtitle2" color="text.secondary">总购买金额 (USD1)</Typography>
+                <Typography variant="subtitle2" color="text.secondary">总充值金额 (USD1)</Typography>
                 <Typography variant="h6">{fNumberWithSeparator(totalPurchase,2)}</Typography>
               </Stack>
             </Stack>
