@@ -104,3 +104,22 @@ export function fData(inputValue: InputNumberValue) {
 
   return fm;
 }
+
+export function fNumberWithSeparator(
+  inputValue: InputNumberValue,
+  precision: number = 2,
+  options?: Options
+) {
+  const locale = formatNumberLocale() || DEFAULT_LOCALE;
+
+  const number = processInput(inputValue);
+  if (number === null) return '';
+
+  const fm = new Intl.NumberFormat(locale.code, {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+    ...options,
+  }).format(number);
+
+  return fm;
+}

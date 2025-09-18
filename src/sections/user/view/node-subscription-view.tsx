@@ -66,6 +66,7 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { EmptyContent } from 'src/components/empty-content';
 import { Label } from 'src/components/label';
+import InputLabel from '@mui/material/InputLabel';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -109,7 +110,7 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 
 // ----------------------------------------------------------------------
 
-type Row = (getNodeSubscriptionLogListResponse['list'][number] & { $productName: string;})
+type Row = (getNodeSubscriptionLogListResponse['list'][number] & { $productName: string; })
 
 // 用户列表视图主组件
 export function NodeSubscriptionView(props: { h: boolean }) {
@@ -394,7 +395,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     3: '社区',
   };
   // 资金流水
-  const handleCapitalFlow = useCallback((row: any,type:any) => {
+  const handleCapitalFlow = useCallback((row: any, type: any) => {
     setCurrentUserForCapitalFlow(row);
     setCurrentUserForCapitalFlowType(type);
     setOpenCapitalFlowDialog(true);
@@ -645,9 +646,9 @@ export function NodeSubscriptionView(props: { h: boolean }) {
     ]
   );
 
-  const calcLevel =  (level:number | string) => {
+  const calcLevel = (level: number | string) => {
     level = parseInt(`${level}`);
-    const isD = level > 5 ;
+    const isD = level > 5;
     if (isD) {
       return `D${level - 5}`
     }
@@ -655,6 +656,12 @@ export function NodeSubscriptionView(props: { h: boolean }) {
   }
 
   const columns: GridColDef[] = [
+    {
+      field: 'address',
+      headerName: '地址 ',
+      minWidth: 300,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
+    },
     {
       field: 'hash',
       headerName: '交易哈希',
@@ -667,12 +674,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
       minWidth: 200,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.tx_at_string || '-'} />,
     },
-    {
-      field: 'address',
-      headerName: '地址 ',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
-    },
+
     {
       field: '$productName',
       headerName: '产品名称 ',
@@ -715,7 +717,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
 
           if (code !== 0) return
           setProductList(data)
-        } catch(error) {}
+        } catch (error) { }
       })()
     },
     []
@@ -728,11 +730,9 @@ export function NodeSubscriptionView(props: { h: boolean }) {
         <CustomBreadcrumbs
           heading="节点认购"
           links={[
-            { name: '数据概览', 
+            {
+              name: '日志',
               // href: paths.dashboard.root 
-            },
-            { name: '日志',
-              // href: paths.dashboard.log.root 
             },
             { name: '节点认购' },
           ]}
@@ -769,18 +769,19 @@ export function NodeSubscriptionView(props: { h: boolean }) {
               />
             </FormControl>
             <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
+              <InputLabel id="demo-simple-select-label">产品名称</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={ filtersForEdit.state.product_id }
+                value={filtersForEdit.state.product_id}
                 label="Age"
                 onChange={(e) => handleProductFilter(e.target.value as number)}
               >
-                <MenuItem value={ Infinity } disabled>请选择您的产品</MenuItem>
+                <MenuItem value={Infinity}>全部</MenuItem>
                 {
                   productList.map(({ id, name, price }) => (
-                    <MenuItem key={ id } value={ id }>
-                      { name }
+                    <MenuItem key={id} value={id}>
+                      {name}
                     </MenuItem>
                   ))
                 }
@@ -888,7 +889,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
         </Dialog>
       )}
       {/* 更绑地址对话框 */}
-      {currentUserForAddress && (
+      {/* {currentUserForAddress && (
         <Dialog
           fullWidth
           maxWidth="sm"
@@ -915,7 +916,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
             onSubmitSuccess={handleSubmitAddress}
           />
         </Dialog>
-      )}
+      )} */}
       {/* 资金流水对话框 */}
       {openCapitalFlowDialog && currentUserForCapitalFlow && (
         <Dialog

@@ -187,8 +187,8 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       },
     },
-    log: {
-      root: `${ROOTS.DASHBOARD}/log/list`,
+    nodeSubscription: {
+      root: `${ROOTS.DASHBOARD}/log`,
       nodeSubscription:  `${ROOTS.DASHBOARD}/log/nodeSubscription`
     },
     product: {
@@ -207,6 +207,7 @@ export const paths = {
       bondPurchaseRecords: `${ROOTS.DASHBOARD}/financialConsole/bondPurchaseRecords`,
       bondBonusIndex: `${ROOTS.DASHBOARD}/financialConsole/bondBonusIndex`,
       bondSalesRecords: `${ROOTS.DASHBOARD}/financialConsole/bondSalesRecords`,
+      nodeOrderList:  `${ROOTS.DASHBOARD}/financialConsole/nodeOrderList`
     },
     invoice: {
       root: `${ROOTS.DASHBOARD}/invoice`,

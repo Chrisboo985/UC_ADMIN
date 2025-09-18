@@ -47,28 +47,28 @@ export const navData = [
   /**
    * Overview
    */
-  // {
-  //   subheader: '数据',
-  //   items: [
-  //     {
-  //       title: '数据概览统计',
-  //       path: paths.dashboard.root,
-  //       icon: ICONS.dashboard,
-  //     },
-  //     {
-  //       title: 'TGAME概览',
-  //       path: paths.dashboard.tGame,
-  //       icon: ICONS.kanban,
-  //     },
-  //     { title: '概览', path: paths.dashboard.root, icon: ICONS.dashboard },
-  //     { title: 'Ecommerce', path: paths.dashboard.general.ecommerce, icon: ICONS.ecommerce },
-  //     { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
-  //     { title: 'Banking', path: paths.dashboard.general.banking, icon: ICONS.banking },
-  //     { title: 'Booking', path: paths.dashboard.general.booking, icon: ICONS.booking },
-  //     { title: 'File', path: paths.dashboard.general.file, icon: ICONS.file },
-  //     { title: 'Course', path: paths.dashboard.general.course, icon: ICONS.course },
-  //   ],
-  // },
+  {
+    subheader: '数据',
+    items: [
+      {
+        title: '数据概览统计',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+      },
+      // {
+      //   title: 'TGAME概览',
+      //   path: paths.dashboard.tGame,
+      //   icon: ICONS.kanban,
+      // },
+      // { title: '概览', path: paths.dashboard.root, icon: ICONS.dashboard },
+      // { title: 'Ecommerce', path: paths.dashboard.general.ecommerce, icon: ICONS.ecommerce },
+      // { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
+      // { title: 'Banking', path: paths.dashboard.general.banking, icon: ICONS.banking },
+      // { title: 'Booking', path: paths.dashboard.general.booking, icon: ICONS.booking },
+      // { title: 'File', path: paths.dashboard.general.file, icon: ICONS.file },
+      // { title: 'Course', path: paths.dashboard.general.course, icon: ICONS.course },
+    ],
+  },
   /**
    * Management
    */
@@ -101,16 +101,6 @@ export const navData = [
           // { title: 'Account', path: paths.dashboard.user.account },
         ],
       },
-
-      {
-        title: '日志',
-        path: paths.dashboard.log.root,
-        icon: ICONS.user,
-        children: [
-          { title: '节点认购', path: paths.dashboard.log.nodeSubscription },
-        ],
-      },
-
       // {
       //   title: '合约操作台',
       //   path: paths.dashboard.lgns.root,
@@ -131,17 +121,26 @@ export const navData = [
       //     // { title: '质押排名', path: paths.dashboard.lgns.stakingRanking },
       //   ],
       // },
-      // {
-      //   title: '财务控制台',
-      //   path: paths.dashboard.financialConsole.root,
-      //   icon: ICONS.order,
-      //   children: [
-      //     // { title: '质押记录', path: paths.dashboard.financialConsole.pledgeRecords },
-      //     { title: '债券购买记录', path: paths.dashboard.financialConsole.bondPurchaseRecords },
-      //     { title: '债券销售记录', path: paths.dashboard.financialConsole.bondSalesRecords },
-      //     // { title: '债券分红流水', path: paths.dashboard.financialConsole.bondBonusIndex },
-      //   ],
-      // },
+      {
+        title: '财务控制台',
+        path: paths.dashboard.financialConsole.root,
+        icon: ICONS.order,
+        children: [
+          // { title: '质押记录', path: paths.dashboard.financialConsole.pledgeRecords },
+          // { title: '债券购买记录', path: paths.dashboard.financialConsole.bondPurchaseRecords },
+          // { title: '债券销售记录', path: paths.dashboard.financialConsole.bondSalesRecords },
+          // { title: '债券分红流水', path: paths.dashboard.financialConsole.bondBonusIndex },
+          { title: '认购节点记录', path: paths.dashboard.financialConsole.nodeOrderList },
+        ],
+      },
+      {
+        title: '日志',
+        path: paths.dashboard.nodeSubscription.root,
+        icon: ICONS.order,
+        children: [
+          { title: '节点认购', path: paths.dashboard.nodeSubscription.nodeSubscription },
+        ],
+      },
       // {
       //   title: '游戏管理-飞机',
       //   path: paths.dashboard.gameAirPortRush.root,

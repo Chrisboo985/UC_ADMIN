@@ -1003,3 +1003,19 @@ export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/m
 
 
 
+export interface OrderListRequest {
+  created_at_end?: number;
+  created_at_start?: number;
+  member_address?: string;
+  page: number;
+  page_size: number;
+  product_id?: number;
+}
+
+export interface OrderListResponse {
+  total_purchase: number | string;
+  list: any[];
+  total: number;
+}
+
+export const getOrderListAPI = (data: OrderListRequest) => axios.post<OrderListResponse>('/admin/order/list', data)

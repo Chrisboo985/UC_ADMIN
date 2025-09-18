@@ -477,6 +477,6 @@ export const getKspBondOfferBuyAPI = () =>
  */
 export const getAdminOutlineAllAPI = () =>
   axios.post<BaseResponse & { data?: import('../sections/lgns/app/view/api').ApifoxModel }>(
-    '/admin/outline/all'
+    '/admin/outline/all_data'
   );
 
