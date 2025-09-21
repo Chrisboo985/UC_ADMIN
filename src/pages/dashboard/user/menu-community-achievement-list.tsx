@@ -6,7 +6,7 @@ import { MenuCommunityAchievementListView } from 'src/sections/user/view';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `菜单社区业绩列表  - ${CONFIG.appName}` };
+const metadata = { title: `社区业绩列表  - ${CONFIG.appName}` };
 
 export default function Page(props: { h?: boolean }) {
   const { h } = props;

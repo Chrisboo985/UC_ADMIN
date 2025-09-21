@@ -201,16 +201,16 @@ export function MenuCommunityAchievementListView(props: { h: boolean }) {
 
   const columns: GridColDef[] = [
     {
-      field: 'is_top_member',
-      headerName: '是否是0号线用户 ',
-      minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.is_top_member ? '是' : '否'} />,
-    },
-    {
       field: 'member_address',
       headerName: '用户地址',
       minWidth: 500,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.member_address || '-'} />,
+    },
+    {
+      field: 'is_top_member',
+      headerName: '是否是0号线用户 ',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.is_top_member ? '是' : '否'} />,
     },
     {
       field: 'purchase_amount',
@@ -248,7 +248,7 @@ export function MenuCommunityAchievementListView(props: { h: boolean }) {
     <>
       <DashboardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <CustomBreadcrumbs
-          heading="菜单社区业绩列表"
+          heading="社区业绩列表"
           links={[
             { name: '管理',
               // href: paths.dashboard.root
@@ -256,7 +256,7 @@ export function MenuCommunityAchievementListView(props: { h: boolean }) {
             { name: '会员',
               // href: paths.dashboard.log.root
             },
-            { name: '菜单社区业绩列表' },
+            { name: '社区业绩列表' },
           ]}
           sx={{ mb: { xs: 3, md: 5 } }}
         />

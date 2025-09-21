@@ -211,7 +211,7 @@ export const dashboardRoutes = [
           // { path: 'cards', element: <UserCardsPage /> },
           { title: '会员列表', path: 'list', element: <UserListPage /> },
           {
-            title: '菜单社区业绩列表',
+            title: '社区业绩列表',
             path: 'menu-community-achievement-list',
             element: <MenuCommunityAchievementListPage />
           },
