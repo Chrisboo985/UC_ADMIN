@@ -35,6 +35,7 @@ const InvoiceEditPage = lazy(() => import('src/pages/dashboard/invoice/edit'));
 const UserProfilePage = lazy(() => import('src/pages/dashboard/user/profile'));
 const UserCardsPage = lazy(() => import('src/pages/dashboard/user/cards'));
 const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
+const MenuCommunityAchievementListPage = lazy(() => import('src/pages/dashboard/user/menu-community-achievement-list'))
 const UserList2Page = lazy(() => import('src/pages/dashboard/user/list'));
 const CommunityRewardQueryPage = lazy(
   () => import('src/pages/dashboard/user/communityRewardQuery')
@@ -209,7 +210,11 @@ export const dashboardRoutes = [
           // { path: 'profile', element: <UserProfilePage /> },
           // { path: 'cards', element: <UserCardsPage /> },
           { title: '会员列表', path: 'list', element: <UserListPage /> },
-          // { title: '会员列表', path: 'h-list', element: <UserList2Page /> },
+          {
+            title: '菜单社区业绩列表',
+            path: 'menu-community-achievement-list',
+            element: <MenuCommunityAchievementListPage />
+          },
           // { title: '网体结构', path: 'organizationalChart', element: <OrganizationalChart /> },
           // { title: '查询上级', path: 'parent-list', element: <ParentListPage /> },
           // { title: '查询修改推荐人记录', path: 'parent-modify-log', element: <ParentModifyLogPage /> },

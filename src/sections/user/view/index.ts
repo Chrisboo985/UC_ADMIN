@@ -19,3 +19,5 @@ export { TransferLogView } from './transfer-log-view';
 export * from './node-subscription-view'
 
 export * from './recharge-list-view'
+
+export { MenuCommunityAchievementListView } from './menu-community-achievement-list-view'

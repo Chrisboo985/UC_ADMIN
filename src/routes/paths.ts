@@ -169,6 +169,7 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/user/list`,
       new: `${ROOTS.DASHBOARD}/user/new`,
       list: `${ROOTS.DASHBOARD}/user/list`,
+      menuCommunityAchievementList: `${ROOTS.DASHBOARD}/user/menu-community-achievement-list`,
       communityRewardQuery: `${ROOTS.DASHBOARD}/user/communityRewardQuery`,
       communityRewardList: `${ROOTS.DASHBOARD}/user/communityRewardList`,
       cards: `${ROOTS.DASHBOARD}/user/cards`,

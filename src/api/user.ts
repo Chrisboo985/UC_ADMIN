@@ -1043,3 +1043,18 @@ export interface OrderListResponse {
 }
 
 export const getOrderListAPI = (data: OrderListRequest) => axios.post<OrderListResponse>('/admin/order/list', data)
+
+export const getMenuCommunityAchievementList = (data: {
+  community_address: string;
+  created_at_end: number | null;
+  created_at_start: number | null;
+}) => axios.post<{
+  list: Array<{
+    is_top_member: boolean;
+    member_address: string;
+    member_id: number;
+    purchase_amount: number;
+    purchase_count: number;
+  }>;
+  total: number;
+}>('/admin/member/network_community_purchase', data)
