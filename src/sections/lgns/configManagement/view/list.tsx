@@ -547,9 +547,9 @@ export function ConfigManagementView() {
                 >
                   <Stack flex={1} direction="row" spacing={2}>
                     <Box sx={{ minWidth: 350 }}>
-                      <Typography variant="subtitle1">默认rebase利率</Typography>
+                      <Typography variant="subtitle1">全网U认购金额奖励占比</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        设置默认的rebase利率
+                        设置全网U认购金额奖励占比
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
