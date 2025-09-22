@@ -155,7 +155,9 @@ export function ConfigManagementView() {
   const handleSaveConfig = async (key: ApiPublicTypes.ConfigItemKey) => {
     try {
       setIsLoading(true);
-      await updateConfig(key, formValues[key]);
+      const response = await updateConfig(key, formValues[key]);
+
+      if (response.code !== 0) return toast.error(response.message)
 
       toast.success('配置已更新');
       fetchConfigData(); // 刷新数据
