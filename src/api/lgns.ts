@@ -1,6 +1,7 @@
 import { ApiResponse, axiosForApi } from 'src/utils/axios';
 
 import type { ResponsesPagedResponseModelsRebaseRateQueue } from 'src/types/rebase';
+import ApiPublicTypes from './public.types'
 
 const axios = axiosForApi;
 
@@ -438,7 +439,7 @@ export const getAllConfigAPI = () => axios.post<any>('/admin/config/all_config')
 
 
 // 设置债券合约使用类型 (1:新债券, 2:旧债券)
-export const setBondContractUseAPI = (type: string) => 
+export const setBondContractUseAPI = (type: string) =>
   axios.post<BaseResponse>('/admin/config/bond_contract_use', {
     key: 'bond_contract_use',
     value: type
@@ -466,5 +467,7 @@ export const setRebaseRateAPIForConfig = (params: any) => axios.post<any>('/admi
 // 获取last_date_all_stake_amount
 export const getLastDateAllStakeAmountAPI = (params: any) => axios.post<any>('/admin/community_reward_log/last_date_all_stake_amount', params);
 
-// 根据key获取配置 
+// 根据key获取配置
 export const getConfigByKeyAPI = (key: string) => axios.post<any>('/admin/config/get_config_by_key', { key });
+
+export const updateConfig = (key: ApiPublicTypes.ConfigItemKey, value: string) => axios.post('/admin/config/update_config_by_key', { key, value })

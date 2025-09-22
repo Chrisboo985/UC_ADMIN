@@ -24,6 +24,8 @@ import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import Checkbox from '@mui/material/Checkbox'
 import { round } from 'lodash-es';
 import {
   DataGrid,
@@ -44,6 +46,7 @@ import {
   setIncrCommunityRewardRateAPI,
   setRebaseRateAPIForConfig,
   getLastDateAllStakeAmountAPI,
+  updateConfig
 } from 'src/api/lgns';
 
 import { paths } from 'src/routes/paths';
@@ -54,6 +57,9 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { CellWithTooltipCopy } from '../user-table-cell';
 import { UserTableFiltersResult } from '../user-table-filters-result';
+import {  type FormValueMap } from './list.types'
+import { ApiPublicTypes } from 'src/api'
+import dayjs from 'dayjs'
 // ----------------------------------------------------------------------
 // 筛选常量
 const HIDE_COLUMNS = { category: false };
@@ -74,25 +80,13 @@ export function ConfigManagementView() {
   // last_date_all_stake_amount
   const [lastDateAllStakeAmount, setLastDateAllStakeAmount] = useState<any>(0);
 
-  // 表单值状态
-  const [formValues, setFormValues] = useState({
-    custom_all_network_team_stake: '0',
-    community_reward_rate: '0.75',
-    custom_incr_all_network_team_stake: '0',
-    incr_community_reward_rate: '0.05',
-    last_rebase_rate: '0.1',
-    rebase_rate: '0.1',
-  });
-
-  // 配置项端点映射
-  const configEndpoints = {
-    custom_all_network_team_stake: '/admin/config/all_team_stake',
-    community_reward_rate: '/admin/config/community_reward_rate',
-    custom_incr_all_network_team_stake: '/admin/config/incr_all_team_stake',
-    incr_community_reward_rate: '/admin/config/incr_community_reward_rate',
-    last_rebase_rate: '/admin/config/last_rebase_rate',
-    rebase_rate: '/admin/config/rebase_rate',
-  };
+  const [formValues, setFormValues] = useState<FormValueMap>({
+    [ApiPublicTypes.ConfigItemKey.PreSaleStartDate]: '0',
+    [ApiPublicTypes.ConfigItemKey.PurchaseBonusRate]: '0',
+    [ApiPublicTypes.ConfigItemKey.NodeSaleSwitch]: '0',
+    [ApiPublicTypes.ConfigItemKey.NftSaleSwitch]: '0',
+    [ApiPublicTypes.ConfigItemKey.NftSaleStartTime]: '0',
+  })
 
   // 获取配置数据
   const fetchConfigData = useCallback(async () => {
@@ -106,7 +100,7 @@ export function ConfigManagementView() {
         setFormValues((prevFormValues) => {
           const newFormValues = { ...prevFormValues };
           response.data.forEach((item: { key: string; value: string }) => {
-            if (item.key in configEndpoints) {
+            if (item.key in formValues) {
               try {
                 // 处理JSON格式的字符串
                 const value = JSON.parse(item.value);
@@ -146,11 +140,11 @@ export function ConfigManagementView() {
   // 初始加载数据
   useEffect(() => {
     fetchConfigData();
-    fetchLastDateAllStakeAmount();
-  }, [fetchConfigData, fetchLastDateAllStakeAmount]);
+    // fetchLastDateAllStakeAmount();
+  }, [fetchConfigData]);
 
   // 更新表单值
-  const handleInputChange = (key: string, value: string) => {
+  const handleInputChange = (key: ApiPublicTypes.ConfigItemKey, value: string) => {
     setFormValues((prev) => ({
       ...prev,
       [key]: value,
@@ -158,36 +152,10 @@ export function ConfigManagementView() {
   };
 
   // 保存配置项
-  const handleSaveConfig = async (key: string) => {
+  const handleSaveConfig = async (key: ApiPublicTypes.ConfigItemKey) => {
     try {
       setIsLoading(true);
-
-      // 创建参数对象
-      const params = {
-        key,
-        value: formValues[key as keyof typeof formValues],
-      };
-
-      // 根据key调用不同的API函数
-      switch (key) {
-        case 'custom_all_network_team_stake':
-          await setAllTeamStakeAPI(params);
-          break;
-        case 'community_reward_rate':
-          await setCommunityRewardRateAPI(params);
-          break;
-        case 'custom_incr_all_network_team_stake':
-          await setIncrAllTeamStakeAPI(params);
-          break;
-        case 'incr_community_reward_rate':
-          await setIncrCommunityRewardRateAPI(params);
-          break;
-        case 'rebase_rate':
-          await setRebaseRateAPIForConfig(params);
-          break;
-        default:
-          throw new Error(`未知的配置项: ${key}`);
-      }
+      await updateConfig(key, formValues[key]);
 
       toast.success('配置已更新');
       fetchConfigData(); // 刷新数据
@@ -419,12 +387,11 @@ export function ConfigManagementView() {
         />
 
         <Box sx={{ p: 3 }}>
-          {/* 配置管理区域 */}
+
           <Stack spacing={4}>
-            {/* 质押业绩配置 */}
             <Card variant="outlined" sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 3 }}>
-                质押业绩配置
+                节点认购
               </Typography>
               <Stack spacing={3}>
                 <Stack
@@ -435,45 +402,30 @@ export function ConfigManagementView() {
                 >
                   <Stack flex={1} direction="row" spacing={2}>
                     <Box sx={{ minWidth: 350 }}>
-                      <Typography variant="subtitle1">自定义全网质押团队业绩</Typography>
+                      <Typography variant="subtitle1">开始时间</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        设置全网的质押团队业绩数值
+                        设置预售开始时间
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="当前值"
-                        inputProps={{ step: 'any' }}
-                        value={formValues.custom_all_network_team_stake}
-                        onChange={(e) =>
-                          handleInputChange('custom_all_network_team_stake', e.target.value)
+                      <DateTimePicker
+                        format='YYYY-MM-DD HH:mm:ss'
+                        views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
+                        label="请选择您的开始时间"
+                        value={
+                          formValues[ApiPublicTypes.ConfigItemKey.PreSaleStartDate] ?
+                          dayjs(+formValues[ApiPublicTypes.ConfigItemKey.PreSaleStartDate] * 1000) :
+                          null
                         }
-                        sx={{ mr: 1 }}
+                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.PreSaleStartDate, e ? e.unix().toString() : '') }
                       />
-                    </Box>
-
-                    <Box
-                      sx={{
-                        minWidth: 250,
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                        参考值
-                      </Typography>
-                      <Typography>
-                        {lastDateAllStakeAmount.all_network_team_stake_amount}
-                      </Typography>
                     </Box>
                   </Stack>
 
                   <Button
                     variant="contained"
                     disabled={isLoading}
-                    onClick={() => handleSaveConfig('custom_all_network_team_stake')}
+                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.PreSaleStartDate)}
                   >
                     保存
                   </Button>
@@ -487,44 +439,22 @@ export function ConfigManagementView() {
                 >
                   <Stack flex={1} direction="row" spacing={2}>
                     <Box sx={{ minWidth: 350 }}>
-                      <Typography variant="subtitle1">自定义全网新增质押团队业绩</Typography>
+                      <Typography variant="subtitle1">开启</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        设置全网的新增质押团队业绩数值
+                        设置节点是否开启购买
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="当前值"
-                        inputProps={{ step: 'any' }}
-                        value={formValues.custom_incr_all_network_team_stake}
-                        onChange={(e) =>
-                          handleInputChange('custom_incr_all_network_team_stake', e.target.value)
-                        }
-                        sx={{ mr: 1 }}
+                      <Checkbox
+                        checked={ formValues[ApiPublicTypes.ConfigItemKey.NodeSaleSwitch] === 'on' }
+                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.NodeSaleSwitch, e.target.checked ? 'on' : 'off') }
                       />
-                    </Box>
-
-                    <Box
-                      sx={{
-                        minWidth: 250,
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                        参考值
-                      </Typography>
-                      <Typography>
-                        {lastDateAllStakeAmount.incr_all_network_team_stake_amount}
-                      </Typography>
                     </Box>
                   </Stack>
                   <Button
                     variant="contained"
                     disabled={isLoading}
-                    onClick={() => handleSaveConfig('custom_incr_all_network_team_stake')}
+                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.NodeSaleSwitch)}
                   >
                     保存
                   </Button>
@@ -532,10 +462,9 @@ export function ConfigManagementView() {
               </Stack>
             </Card>
 
-            {/* 奖励比率配置 */}
             <Card variant="outlined" sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 3 }}>
-                奖励比率配置
+                NFT认购
               </Typography>
               <Stack spacing={3}>
                 <Stack
@@ -546,27 +475,29 @@ export function ConfigManagementView() {
                 >
                   <Stack flex={1} direction="row" spacing={2}>
                     <Box sx={{ minWidth: 350 }}>
-                      <Typography variant="subtitle1">社区奖励波比</Typography>
+                      <Typography variant="subtitle1">开始时间</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        设置社区奖励的波比比率
+                        设置nft开售时间
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="当前值"
-                        inputProps={{ min: 0, max: 0.999, step: 0.001 }}
-                        value={formValues.community_reward_rate}
-                        onChange={(e) => handleInputChange('community_reward_rate', e.target.value)}
-                        sx={{ mr: 1 }}
+                      <DateTimePicker
+                        format='YYYY-MM-DD HH:mm:ss'
+                        views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
+                        label="请选择您的开始时间"
+                        value={
+                          formValues[ApiPublicTypes.ConfigItemKey.NftSaleStartTime] ?
+                          dayjs(+formValues[ApiPublicTypes.ConfigItemKey.NftSaleStartTime] * 1000) :
+                          null
+                        }
+                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.NftSaleStartTime, e ? e.unix().toString() : '') }
                       />
                     </Box>
                   </Stack>
                   <Button
                     variant="contained"
                     disabled={isLoading}
-                    onClick={() => handleSaveConfig('community_reward_rate')}
+                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.NftSaleStartTime)}
                   >
                     保存
                   </Button>
@@ -580,29 +511,22 @@ export function ConfigManagementView() {
                 >
                   <Stack flex={1} direction="row" spacing={2}>
                     <Box sx={{ minWidth: 350 }}>
-                      <Typography variant="subtitle1">社区新增奖励波比</Typography>
+                      <Typography variant="subtitle1">开启</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        设置社区新增奖励的波比比率
+                        设置nft是否开启购买
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="当前值"
-                        inputProps={{ min: 0, max: 0.999, step: 0.001 }}
-                        value={formValues.incr_community_reward_rate}
-                        onChange={(e) =>
-                          handleInputChange('incr_community_reward_rate', e.target.value)
-                        }
-                        sx={{ mr: 1 }}
+                      <Checkbox
+                        checked={ formValues[ApiPublicTypes.ConfigItemKey.NftSaleSwitch] === 'on' }
+                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.NftSaleSwitch, e.target.checked ? 'on' : 'off') }
                       />
                     </Box>
                   </Stack>
                   <Button
                     variant="contained"
                     disabled={isLoading}
-                    onClick={() => handleSaveConfig('incr_community_reward_rate')}
+                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.NftSaleSwitch)}
                   >
                     保存
                   </Button>
@@ -610,10 +534,9 @@ export function ConfigManagementView() {
               </Stack>
             </Card>
 
-            {/* Rebase配置 */}
             <Card variant="outlined" sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 3 }}>
-                Rebase配置
+                认购奖金池比例
               </Typography>
               <Stack spacing={3}>
                 <Stack
@@ -632,11 +555,10 @@ export function ConfigManagementView() {
                     <Box sx={{ minWidth: 250 }}>
                       <TextField
                         fullWidth
-                        type="number"
                         label="当前值"
                         inputProps={{ min: 0, max: 0.999, step: 0.001 }}
-                        value={formValues.rebase_rate}
-                        onChange={(e) => handleInputChange('rebase_rate', e.target.value)}
+                        value={formValues[ApiPublicTypes.ConfigItemKey.PurchaseBonusRate]}
+                        onChange={(e) => handleInputChange(ApiPublicTypes.ConfigItemKey.PurchaseBonusRate, e.target.value)}
                         sx={{ mr: 1 }}
                       />
                     </Box>
@@ -644,7 +566,7 @@ export function ConfigManagementView() {
                   <Button
                     variant="contained"
                     disabled={isLoading}
-                    onClick={() => handleSaveConfig('rebase_rate')}
+                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.PurchaseBonusRate)}
                   >
                     保存
                   </Button>

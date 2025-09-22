@@ -306,7 +306,7 @@ export function NodeOrderListView(props: { h: boolean }) {
       field: 'tx_at',
       headerName: '交易时间',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={dayjs(params.row.tx_at).format('YYYY-MM-DD HH:mm:ss') || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={dayjs(params.row.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss') || '-'} />,
     },
     {
       field: 'created_at_string',

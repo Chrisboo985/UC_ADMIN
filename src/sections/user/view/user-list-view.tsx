@@ -110,8 +110,8 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 type Row = getMemberListAPIResponse['list'][number] & { $parentAddress: string | undefined; }
 
 const userTypeItems: UserTypeItem[] = [
-  { label: '全部', value: UserType.All },
-  { label: '普通用户', value: UserType.Normal },
+  // { label: '全部', value: UserType.All },
+  // { label: '普通用户', value: UserType.Normal },
   { label: '社区用户', value: UserType.Community }
 ]
 
@@ -751,6 +751,12 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_usdt_recharge_amount  || '-'} />,
     },
     {
+      field: 'community_at_string',
+      headerName: '社区成立时间',
+      minWidth: 190,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at_string  || '-'} />,
+    },
+    {
       field: 'power',
       headerName: '算力',
       minWidth: 170,
@@ -779,6 +785,12 @@ export function UserListView(props: { h: boolean }) {
       headerName: '团队节点认购数量',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.network_order_count || '-'} />,
+    },
+    {
+      field: 'order_reward',
+      headerName: '认购奖励',
+      minWidth: 170,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.order_reward || '-'} />,
     },
     {
       field: 'team_usdt_recharge_amount',
@@ -814,13 +826,13 @@ export function UserListView(props: { h: boolean }) {
       cellClassName: 'sticky-column',
       getActions: (params) => [
         // 节点认购
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:currency-usd" />}
-          label="节点认购"
-          onClick={() => handleResetPassword(params.row)}
-          disabled={false}
-        />,
+        // <GridActionsCellItem
+        //   showInMenu
+        //   icon={<Iconify icon="mdi:currency-usd" />}
+        //   label="节点认购"
+        //   onClick={() => handleResetPassword(params.row)}
+        //   disabled={false}
+        // />,
         // 设置用户类型
         <GridActionsCellItem
           showInMenu
@@ -881,7 +893,7 @@ export function UserListView(props: { h: boolean }) {
                 fullWidth
                 value={filtersForEdit.state.address}
                 onChange={handleFilterAddress}
-                placeholder="请输入上级地址"
+                placeholder="请输入用户地址"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
