@@ -90,7 +90,8 @@ import {
   UserType,
   getMemberListReqeust,
   setUserTypeAPI,
-  setLine0UserType
+  setLine0UserType,
+  setVirtualZoneOpenStatus
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -354,6 +355,40 @@ export function UserListView(props: { h: boolean }) {
     []
   )
 
+  const [row, setRow] = React.useState<Row | null>(null)
+  const [openStatusDialog2, setOpenStatusDialog2] = React.useState(false)
+
+  const handleVirtualZoneOpenStatusChange = React.useCallback(
+    (row: Row) => {
+      setRow(row)
+      setOpenStatusDialog2(true)
+    },
+    []
+  )
+
+  const handleConfirmStatusChange2 = React.useCallback(
+    async () => {
+      setOpenStatusDialog2(false)
+      const toastId = toast.loading('正在设置中...');
+      try {
+        const { id, open_virtual_region } = row!
+        const response = await setVirtualZoneOpenStatus({ member_id: id, open_virtual_region: !open_virtual_region })
+
+        if (response.code !== 0) return toast.error(response.message || '设置失败')
+        toast.success('设置成功');
+        getList();
+      } catch (error) {
+        console.log(error)
+        console.error('设置失败:', error);
+        toast.error('设置失败', { id: toastId });
+      } finally {
+        setRow(null)
+        toast.dismiss(toastId)
+      }
+    },
+    [row]
+  )
+
   const columns: GridColDef[] = [
     {
       field: 'address',
@@ -534,6 +569,17 @@ export function UserListView(props: { h: boolean }) {
           disabled={ params.row.top_member }
           checked={ params.row.top_member }
           onChange={ () => handleUserTypeChange(UserType.Line0, params.row) }
+        />
+      ),
+    },
+    {
+      field: '$setVirtualZoneOpenStatus',
+      headerName: '开启虚拟大区',
+      minWidth: 120,
+      renderCell: (params) => (
+        <Switch
+          checked={ params.row.open_virtual_region }
+          onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
         />
       ),
     },
@@ -741,7 +787,6 @@ export function UserListView(props: { h: boolean }) {
         </Dialog>
       )}
 
-      {/* 用户状态切换确认弹窗 */}
       <ConfirmDialog
         open={openStatusDialog}
         onClose={() => setOpenStatusDialog(false)}
@@ -756,6 +801,22 @@ export function UserListView(props: { h: boolean }) {
             variant="contained"
             color='error'
             onClick={handleConfirmStatusChange}
+          >
+            确认
+          </Button>
+        }
+      />
+
+      <ConfirmDialog
+        open={openStatusDialog2}
+        onClose={() => setOpenStatusDialog2(false)}
+        title="确认状态变更"
+        content={`是否确定要${ row?.open_virtual_region ? '关闭' : '开启' }虚拟大区`}
+        action={
+          <Button
+            variant="contained"
+            color='error'
+            onClick={handleConfirmStatusChange2}
           >
             确认
           </Button>

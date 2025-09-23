@@ -993,6 +993,7 @@ export type getMemberListAPIResponse = {
     withdraw_limit: number;
     type: UserType;
     id: number;
+    open_virtual_region: boolean;
   }>;
   total: number;
 }
@@ -1087,3 +1088,4 @@ export const getCommunityRewardsList = (data: {
   }>;
   total: number;
 }>('/admin/member/community_reward', data)
+export const setVirtualZoneOpenStatus = (data: { member_id: number; open_virtual_region: boolean; }) => axios.post('/admin/member/update_virtual_region', data)
