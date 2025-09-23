@@ -51,7 +51,7 @@ import {
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { IconButton, MenuItem, Switch } from '@mui/material';
+import { Checkbox, IconButton, MenuItem, Switch } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 
@@ -89,7 +89,8 @@ import {
   type getMemberListAPIResponse,
   UserType,
   getMemberListReqeust,
-  setUserTypeAPI
+  setUserTypeAPI,
+  setLine0UserType
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -112,7 +113,7 @@ type Row = getMemberListAPIResponse['list'][number] & { $parentAddress: string |
 const userTypeItems: UserTypeItem[] = [
   // { label: '全部', value: UserType.All },
   // { label: '普通用户', value: UserType.Normal },
-  { label: '社区用户', value: UserType.Community }
+  { label: '社区用户', value: UserType.Community },
 ]
 
 // ----------------------------------------------------------------------
@@ -159,55 +160,20 @@ export function UserListView(props: { h: boolean }) {
   // 筛选按钮元素
   const [filterButtonEl, setFilterButtonEl] = useState<HTMLButtonElement | null>(null);
   // 列显示模式
-  const [columnVisibilityModel, setColumnVisibilityModel] =
-    useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
   // 分页
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
 
   const [usersLoading, setUsersLoading] = useState<true | false>(false);
 
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-
   // 用户状态切换相关状态
   const [selectedUser, setSelectedUser] = useState<IUserItemforlist | null>(null);
-  const [newUserStatus, setNewUserStatus] = useState<'normal' | 'blocked'>('normal');
   const [openStatusDialog, setOpenStatusDialog] = useState(false);
-
-  // 用户地址状态切换相关状态
-  const [selectedUserForAddressStatus, setSelectedUserForAddressStatus] = useState<IUserItemforlist | null>(null);
-  const [newAddressStatus, setNewAddressStatus] = useState<'normal' | 'blocked'>('normal');
-  const [openAddressStatusDialog, setOpenAddressStatusDialog] = useState(false);
-
-  // 用户提现状态切换相关状态
-  const [selectedUserForWithdrawStatus, setSelectedUserForWithdrawStatus] = useState<IUserItemforlist | null>(null);
-  const [newWithdrawStatus, setNewWithdrawStatus] = useState<'normal' | 'blocked'>('normal');
-  const [openWithdrawStatusDialog, setOpenWithdrawStatusDialog] = useState(false);
-
-  // 重置密码相关状态
-  const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
-  const [currentUserForResetPassword, setCurrentUserForResetPassword] = useState<IUserItemforlist | null>(null);
 
   // 更绑地址相关状态
   const [openAddressDialog, setOpenAddressDialog] = useState(false);
   const [currentUserForAddress, setCurrentUserForAddress] = useState<IUserItemforlist | null>(null);
 
-  // 资金流水相关状态
-  const [openCapitalFlowDialog, setOpenCapitalFlowDialog] = useState(false);
-  const [currentUserForCapitalFlow, setCurrentUserForCapitalFlow] = useState<IUserItemforlist | null>(null);
-
-  const [currentUserForCapitalFlowType, setCurrentUserForCapitalFlowType] = useState<any>(null);
-
-  // 更改上级相关状态
-  const [openChangeSuperiorDialog, setOpenChangeSuperiorDialog] = useState(false);
-  const [currentUserForChangeSuperior, setCurrentUserForChangeSuperior] = useState<IUserItemforlist | null>(null);
-
-  // 设置等级相关状态
-  const [openSetLevelDialog, setOpenSetLevelDialog] = useState(false);
-  const [currentUserForSetLevel, setCurrentUserForSetLevel] = useState<IUserItemforlist | null>(null);
-
-  // 批量封禁相关状态
-  const [openBatchBanDialog, setOpenBatchBanDialog] = useState(false);
-  const [currentUserForBatchBan, setCurrentUserForBatchBan] = useState<IUserItemforlist | null>(null);
   // 筛选条件是否能够重置
   const canReset = !!filtersForEdit.state.address || !!filtersForEdit.state.h_username || !!filtersForEdit.state.member_code || !!filtersForEdit.state.is_business || !!filtersForEdit.state.parent_code || !!filtersForEdit.state.created_at_start || !!filtersForEdit.state.created_at_end;
 
@@ -285,58 +251,6 @@ export function UserListView(props: { h: boolean }) {
   const [openTypeDialog, setOpenTypeDialog] = useState(false);
   const [selectedType, setSelectedType] = useState<1 | 2 | 3>(1);
 
-  // 打开会员类型选择对话框
-  const handleOpenTypeDialog = useCallback((userId: number | undefined, userType: 1 | 2 | 3) => {
-    if (!userId) return;
-    setSelectedUserId(userId);
-    setSelectedType(userType);
-    setOpenTypeDialog(true);
-  }, []);
-
-  // 关闭会员类型选择对话框
-  const handleCloseTypeDialog = useCallback(() => {
-    setOpenTypeDialog(false);
-    setSelectedUserId(null);
-  }, []);
-
-  // 处理会员类型设置
-  const handleSetMemberType = useCallback(async () => {
-    if (!selectedUserId || !selectedType) return;
-
-    try {
-      const response = await setMemberTypeAPI({ id: selectedUserId, member_type: selectedType });
-      if (response.data) {
-        toast.success('会员类型设置成功');
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '设置失败');
-      }
-    } catch (error) {
-      toast.error('操作失败');
-    } finally {
-      handleCloseTypeDialog();
-    }
-  }, [selectedUserId, selectedType, getList, handleCloseTypeDialog]);
-
-  // 处理重置密码
-  const handleResetPassword = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForResetPassword(user);
-    setOpenResetPasswordDialog(true);
-  }, []);
-
-  // 设置用户类型
-  const setUserType = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForAddress(user);
-    setOpenAddressDialog(true);
-  }, []);
-
-
-
-  // 更绑地址
-  const handleAddress = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForAddress(user);
-    setOpenAddressDialog(true);
-  }, []);
   // 关闭更绑地址弹框
   const handleCloseAddressDialog = useCallback(() => {
     setOpenAddressDialog(false);
@@ -365,256 +279,39 @@ export function UserListView(props: { h: boolean }) {
     }
   }, [getList, handleCloseAddressDialog]);
   // 关闭重置密码弹窗
-  const handleCloseResetPasswordDialog = useCallback(() => {
-    setOpenResetPasswordDialog(false);
-    setCurrentUserForResetPassword(null);
-  }, []);
 
-  // 提交重置密码
-  const handleSubmitResetPassword = useCallback(async (data: ConfirmNodeSubscriptionRequest) => {
-    const toastId = toast.loading('正在认购...');
-    try {
-      const response = await confrimNodeSubscriptionAPI(data);
-      if (response.code === 0) {
-        toast.success('认购成功');
-        handleCloseResetPasswordDialog();
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '认购失败');
-      }
-    } catch (error: any) {
-      console.error('认购失败:', error);
-      toast.error(error.message || '认购失败');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  }, [getList, handleCloseResetPasswordDialog]);
-
-  // 会员类型映射
-  const memberTypeMap = {
-    1: '默认',
-    2: '运营中心',
-    3: '社区',
-  };
-  // 资金流水
-  const handleCapitalFlow = useCallback((row: any,type:any) => {
-    setCurrentUserForCapitalFlow(row);
-    setCurrentUserForCapitalFlowType(type);
-    setOpenCapitalFlowDialog(true);
-  }, []);
-  // 关闭资金流水
-  const handleCloseCapitalFlowDialog = useCallback(() => {
-    setOpenCapitalFlowDialog(false);
-    setCurrentUserForCapitalFlow(null);
-  }, []);
-
-  // 更改上级处理函数
-  const handleChangeSuperior = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForChangeSuperior(user);
-    setOpenChangeSuperiorDialog(true);
-  }, []);
-
-  const handleCloseChangeSuperiorDialog = useCallback(() => {
-    setOpenChangeSuperiorDialog(false);
-    setCurrentUserForChangeSuperior(null);
-  }, []);
-
-  const handleSubmitChangeSuperior = useCallback(async (data: { id: number; parent_code: string | null }) => {
-    try {
-      // TODO: 这里需要添加更改上级的API调用
-      // await changeSuperiorAPI(data);
-      console.log('更改上级数据:', data);
-      toast.success('上级更改成功');
-      handleCloseChangeSuperiorDialog();
-      getList();
-    } catch (error) {
-      console.error('更改上级失败:', error);
-      toast.error('更改上级失败');
-    }
-  }, [getList, handleCloseChangeSuperiorDialog]);
-
-  // 设置等级处理函数
-  const handleSetLevel = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForSetLevel(user);
-    setOpenSetLevelDialog(true);
-  }, []);
-
-  const handleCloseSetLevelDialog = useCallback(() => {
-    setOpenSetLevelDialog(false);
-    setCurrentUserForSetLevel(null);
-  }, []);
-
-  const handleSubmitSetLevel = useCallback(async (data: { p_level: string; s_level: string }) => {
-    try {
-      // TODO: 这里需要添加设置等级的API调用
-      // await setUserLevelAPI({ userId: currentUserForSetLevel?.id, ...data });
-      console.log('设置等级数据:', {
-        userId: currentUserForSetLevel?.id,
-        ...data,
-      });
-      toast.success('等级设置成功');
-      handleCloseSetLevelDialog();
-      getList();
-    } catch (error) {
-      console.error('设置等级失败:', error);
-      toast.error('设置等级失败');
-    }
-  }, [currentUserForSetLevel?.id, getList, handleCloseSetLevelDialog]);
+  const [userId, setUserId] = useState<number | undefined>(undefined)
+  const [newUserStatus, setNewUserStatus] = useState<UserType.Community | UserType.Line0 | undefined>(undefined)
 
   // 处理用户状态切换确认
   const handleConfirmStatusChange = useCallback(async () => {
-    if (!selectedUser) return;
-
-    const toastId = toast.loading('正在更新用户状态...');
+    setOpenStatusDialog(false)
+    const toastId = toast.loading('正在设置中...');
     try {
-      const response = await updateUserStatusAPI({
-        id: Number(selectedUser.id),
-        status: newUserStatus,
-      });
+      const response = await (
+        newUserStatus === UserType.Community ?
+        setUserTypeAPI({ member_id: userId!, type: UserType.Community }) :
+        setLine0UserType({ member_id: userId! })
+      )
 
-      if (response.data) {
-        toast.success(`用户状态已更新为${newUserStatus === 'normal' ? '正常' : '封禁'}`, { id: toastId });
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '状态更新失败', { id: toastId });
-      }
+      if (response.code !== 0) return toast.error(response.message || '设置失败')
+        toast.success('设置成功');
+
+        getList();
     } catch (error) {
-      console.error('更新用户状态失败:', error);
-      toast.error('状态更新失败', { id: toastId });
+      console.error('设置失败:', error);
+      toast.error('设置失败', { id: toastId });
     } finally {
-      setOpenStatusDialog(false);
-      setSelectedUser(null);
+      setUserId(undefined)
+      setNewUserStatus(undefined)
+      toast.dismiss(toastId)
     }
-  }, [selectedUser, newUserStatus, getList]);
+  }, [newUserStatus, getList]);
 
-  // 处理用户地址状态切换确认
-  const handleConfirmAddressStatusChange = useCallback(async () => {
-    if (!selectedUserForAddressStatus) return;
-
-    const toastId = toast.loading('正在更新地址状态...');
-    try {
-      const response = await updateMemberAddressStatusAPI({
-        id: Number(selectedUserForAddressStatus.id),
-        address_status: newAddressStatus,
-      });
-
-      if (response.data) {
-        toast.success(`地址状态已更新为${newAddressStatus === 'normal' ? '正常' : '封禁'}`, { id: toastId });
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '地址状态更新失败', { id: toastId });
-      }
-    } catch (error) {
-      console.error('更新地址状态失败:', error);
-      toast.error('地址状态更新失败', { id: toastId });
-    } finally {
-      setOpenAddressStatusDialog(false);
-      setSelectedUserForAddressStatus(null);
-    }
-  }, [selectedUserForAddressStatus, newAddressStatus, getList]);
-
-  // 处理用户提现状态切换确认
-  const handleConfirmWithdrawStatusChange = useCallback(async () => {
-    if (!selectedUserForWithdrawStatus) return;
-
-    const toastId = toast.loading('正在更新提现状态...');
-    try {
-      const response = await updateMemberWithdrawStatusAPI({
-        id: Number(selectedUserForWithdrawStatus.id),
-        withdraw_status: newWithdrawStatus,
-      });
-
-      if (response.data) {
-        toast.success(`提现状态已更新为${newWithdrawStatus === 'normal' ? '正常' : '禁用'}`, { id: toastId });
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '提现状态更新失败', { id: toastId });
-      }
-    } catch (error) {
-      console.error('更新提现状态失败:', error);
-      toast.error('提现状态更新失败', { id: toastId });
-    } finally {
-      setOpenWithdrawStatusDialog(false);
-      setSelectedUserForWithdrawStatus(null);
-    }
-  }, [selectedUserForWithdrawStatus, newWithdrawStatus, getList]);
-
-  // 批量封禁处理函数
-  const handleBatchBan = useCallback((user: IUserItemforlist) => {
-    setCurrentUserForBatchBan(user);
-    setOpenBatchBanDialog(true);
-  }, []);
-
-  const handleCloseBatchBanDialog = useCallback(() => {
-    setOpenBatchBanDialog(false);
-    setCurrentUserForBatchBan(null);
-  }, []);
-
-  const handleConfirmBatchBan = useCallback(async () => {
-    if (!currentUserForBatchBan) return;
-
-    const toastId = toast.loading('正在封禁用户...');
-    try {
-      const response = await updateMemberNetStatusAPI({
-        id: Number(currentUserForBatchBan.id),
-        status: 'blocked',
-      });
-
-      if (response.data) {
-        toast.success('用户已成功封禁', { id: toastId });
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '封禁失败', { id: toastId });
-      }
-    } catch (error) {
-      console.error('封禁用户失败:', error);
-      toast.error('封禁失败', { id: toastId });
-    } finally {
-      handleCloseBatchBanDialog();
-    }
-  }, [currentUserForBatchBan, getList, handleCloseBatchBanDialog]);
-
-  const handleConfirmBatchUnban = useCallback(async () => {
-    if (!currentUserForBatchBan) return;
-
-    const toastId = toast.loading('正在解封用户...');
-    try {
-      const response = await updateMemberNetStatusAPI({
-        id: Number(currentUserForBatchBan.id),
-        status: 'normal',
-      });
-
-      if (response.data) {
-        toast.success('用户已成功解封', { id: toastId });
-        getList(); // 刷新列表
-      } else {
-        toast.error(response.message || '解封失败', { id: toastId });
-      }
-    } catch (error) {
-      console.error('解封用户失败:', error);
-      toast.error('解封失败', { id: toastId });
-    } finally {
-      handleCloseBatchBanDialog();
-    }
-  }, [currentUserForBatchBan, getList, handleCloseBatchBanDialog]);
 
   const handleFilterAddress = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       filtersForEdit.setState({ address: event.target.value });
-    },
-    [filtersForEdit] // Include filtersForEdit in dependencies
-  );
-
-  const handleFilterHUsername = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      filtersForEdit.setState({ h_username: event.target.value });
-    },
-    [filtersForEdit]
-  );
-
-  const handleFilterMemberCode = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      filtersForEdit.setState({ member_code: event.target.value });
     },
     [filtersForEdit] // Include filtersForEdit in dependencies
   );
@@ -648,14 +345,14 @@ export function UserListView(props: { h: boolean }) {
     ]
   );
 
-  const calcLevel =  (level:number | string) => {
-    level = parseInt(`${level}`);
-    const isD = level > 5 ;
-    if (isD) {
-      return `D${level - 5}`
-    }
-    return `P${level}`
-  }
+  const handleUserTypeChange = React.useCallback(
+    (type: UserType.Community | UserType.Line0, row: Row) => {
+      setUserId(row.id)
+      setNewUserStatus(type)
+      setOpenStatusDialog(true)
+    },
+    []
+  )
 
   const columns: GridColDef[] = [
     {
@@ -757,6 +454,12 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at_string  || '-'} />,
     },
     {
+      field: '$test',
+      headerName: '0号线成立时间',
+      minWidth: 190,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.$test  || '-'} />,
+    },
+    {
       field: 'power',
       headerName: '算力',
       minWidth: 170,
@@ -811,38 +514,53 @@ export function UserListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
     },
     {
-      type: 'actions',
-      field: 'actions',
-      pinnable: true,
-      headerName: '操作',
-      align: 'right',
-      headerAlign: 'right',
-      width: 80,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      // Fixed column
-      headerClassName: 'sticky-column',
-      cellClassName: 'sticky-column',
-      getActions: (params) => [
-        // 节点认购
-        // <GridActionsCellItem
-        //   showInMenu
-        //   icon={<Iconify icon="mdi:currency-usd" />}
-        //   label="节点认购"
-        //   onClick={() => handleResetPassword(params.row)}
-        //   disabled={false}
-        // />,
-        // 设置用户类型
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="mdi:currency-usd" />}
-          label="设置用户类型"
-          onClick={() => setUserType(params.row)}
-          disabled={false}
-        />,
-      ],
+      field: '$setCommunityUser',
+      headerName: '设为社区用户 ',
+      minWidth: 120,
+      renderCell: (params) => (
+        <Switch
+          disabled={ params.row.type === UserType.Community }
+          checked={ params.row.type === UserType.Community }
+          onChange={ () => handleUserTypeChange(UserType.Community, params.row) }
+        />
+      ),
     },
+    {
+      field: '$setLine0User',
+      headerName: '设为0号线用户 ',
+      minWidth: 120,
+      renderCell: (params) => (
+        <Switch
+          disabled={ params.row.top_member }
+          checked={ params.row.top_member }
+          onChange={ () => handleUserTypeChange(UserType.Line0, params.row) }
+        />
+      ),
+    },
+    // {
+    //   type: 'actions',
+    //   field: 'actions',
+    //   pinnable: true,
+    //   headerName: '操作',
+    //   align: 'right',
+    //   headerAlign: 'right',
+    //   width: 80,
+    //   sortable: false,
+    //   filterable: false,
+    //   disableColumnMenu: true,
+    //   // Fixed column
+    //   headerClassName: 'sticky-column',
+    //   cellClassName: 'sticky-column',
+    //   getActions: (params) => [
+    //     <GridActionsCellItem
+    //       showInMenu
+    //       icon={<Iconify icon="mdi:currency-usd" />}
+    //       label="设置用户类型"
+    //       onClick={() => setUserType(params.row)}
+    //       disabled={false}
+    //     />,
+    //   ],
+    // },
   ];
 
   const getTogglableColumns = () =>
@@ -993,34 +711,6 @@ export function UserListView(props: { h: boolean }) {
         </Card>
       </DashboardContent>
 
-      {/* 重置密码对话框 */}
-      {currentUserForResetPassword && (
-        <Dialog
-          fullWidth
-          maxWidth="xs"
-          open={openResetPasswordDialog}
-          onClose={handleCloseResetPasswordDialog}
-          transitionDuration={{
-            enter: theme.transitions.duration.shortest,
-            exit: theme.transitions.duration.shortest - 80,
-          }}
-          PaperProps={{
-            sx: {
-              display: 'flex',
-              overflow: 'hidden',
-              flexDirection: 'column',
-              '& form': { minHeight: 0, display: 'flex', flex: '1 1 auto', flexDirection: 'column' },
-            },
-          }}
-        >
-          <ResetPasswordForm
-            currentUser={currentUserForResetPassword}
-            open={openResetPasswordDialog}
-            onClose={handleCloseResetPasswordDialog}
-            onSubmitSuccess={handleSubmitResetPassword}
-          />
-        </Dialog>
-      )}
       {/* 设置用户类型弹窗 */}
       {currentUserForAddress && (
         <Dialog
@@ -1050,168 +740,27 @@ export function UserListView(props: { h: boolean }) {
           />
         </Dialog>
       )}
-      {/* 资金流水对话框 */}
-      {openCapitalFlowDialog && currentUserForCapitalFlow && (
-        <Dialog
-          fullWidth
-          maxWidth="lg"
-          open={openCapitalFlowDialog}
-          onClose={handleCloseCapitalFlowDialog}
-          transitionDuration={{
-            enter: theme.transitions.duration.shortest,
-            exit: theme.transitions.duration.shortest - 80,
-          }}
-          PaperProps={{
-            sx: {
-              display: 'flex',
-              overflow: 'hidden',
-              flexDirection: 'column',
-              minHeight: '70vh',
-              '& form': { minHeight: 0, display: 'flex', flex: '1 1 auto', flexDirection: 'column' },
-            },
-          }}
-        >
-          <CapitalFlowForm
-            currentUser={currentUserForCapitalFlow}
-            type={currentUserForCapitalFlowType}
-            open={openCapitalFlowDialog}
-            onClose={handleCloseCapitalFlowDialog}
-          />
-        </Dialog>
-      )}
-      {/* 更改上级对话框 */}
-      {currentUserForChangeSuperior && (
-        <Dialog
-          fullWidth
-          maxWidth="sm"
-          open={openChangeSuperiorDialog}
-          onClose={handleCloseChangeSuperiorDialog}
-          transitionDuration={{
-            enter: theme.transitions.duration.shortest,
-            exit: theme.transitions.duration.shortest - 80,
-          }}
-          PaperProps={{
-            sx: {
-              display: 'flex',
-              overflow: 'hidden',
-              flexDirection: 'column',
-              minHeight: '50vh',
-              '& form': { minHeight: 0, display: 'flex', flex: '1 1 auto', flexDirection: 'column' },
-            },
-          }}
-        >
-          <ChangeSuperiorForm
-            currentUser={currentUserForChangeSuperior}
-            open={openChangeSuperiorDialog}
-            onClose={handleCloseChangeSuperiorDialog}
-            onSubmitSuccess={handleSubmitChangeSuperior}
-          />
-        </Dialog>
-      )}
-      {/* 设置等级对话框 */}
-      {currentUserForSetLevel && (
-        <SetLevelForm
-          open={openSetLevelDialog}
-          onClose={handleCloseSetLevelDialog}
-          onSuccess={getList}
-          currentUser={{
-            id: currentUserForSetLevel.id?.toString(),
-            member_code: currentUserForSetLevel.member_code,
-            virtual_level: currentUserForSetLevel.virtual_level,
-            star_level: currentUserForSetLevel.star_level,
-          }}
-        />
-      )}
 
       {/* 用户状态切换确认弹窗 */}
       <ConfirmDialog
         open={openStatusDialog}
         onClose={() => setOpenStatusDialog(false)}
         title="确认状态变更"
-        content={`确定要将用户状态更改为${newUserStatus === 'normal' ? ' 正常 ' : ' 封禁 '}吗？`}
+        content={
+          newUserStatus === UserType.Community ?
+          '确定要设为社区用户吗？' :
+          '0号线账号，将自动升级为社区，是否确认将用户设置为0号线账号？'
+        }
         action={
           <Button
             variant="contained"
-            color={newUserStatus === 'normal' ? 'success' : 'error'}
+            color='error'
             onClick={handleConfirmStatusChange}
           >
             确认
           </Button>
         }
       />
-
-      {/* 用户地址状态切换确认弹窗 */}
-      <ConfirmDialog
-        open={openAddressStatusDialog}
-        onClose={() => setOpenAddressStatusDialog(false)}
-        title="确认地址状态变更"
-        content={`确定要将地址状态更改为${newAddressStatus === 'normal' ? ' 正常 ' : ' 禁用 '}吗？`}
-        action={
-          <Button
-            variant="contained"
-            color={newAddressStatus === 'normal' ? 'success' : 'error'}
-            onClick={handleConfirmAddressStatusChange}
-          >
-            确认
-          </Button>
-        }
-      />
-
-      {/* 用户提现状态切换确认弹窗 */}
-      <ConfirmDialog
-        open={openWithdrawStatusDialog}
-        onClose={() => setOpenWithdrawStatusDialog(false)}
-        title="确认提现状态变更"
-        content={`确定要将提现状态更改为${newWithdrawStatus === 'normal' ? ' 正常 ' : ' 禁用 '}吗？`}
-        action={
-          <Button
-            variant="contained"
-            color={newWithdrawStatus === 'normal' ? 'success' : 'error'}
-            onClick={handleConfirmWithdrawStatusChange}
-          >
-            确认
-          </Button>
-        }
-      />
-
-      {/* 批量封禁确认弹窗 */}
-      <Dialog
-        open={openBatchBanDialog}
-        onClose={handleCloseBatchBanDialog}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle sx={{ pb: 2, pr: 6 }}>
-          网体封禁/解封
-          <IconButton
-            onClick={handleCloseBatchBanDialog}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
-            <Iconify icon="mingcute:close-line" />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent sx={{ typography: 'body2' }}>
-          此操作将批量封禁/解封该用户{currentUserForBatchBan?.member_code}和其所有伞下会员！
-        </DialogContent>
-
-        <DialogActions sx={{ gap: 1 }}>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleConfirmBatchBan}
-          >
-            封禁
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleConfirmBatchUnban}
-          >
-            解封
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }

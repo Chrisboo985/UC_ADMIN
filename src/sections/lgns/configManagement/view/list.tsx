@@ -25,7 +25,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import Checkbox from '@mui/material/Checkbox'
+import Switch from '@mui/material/Switch'
 import { round } from 'lodash-es';
 import {
   DataGrid,
@@ -60,6 +60,7 @@ import { UserTableFiltersResult } from '../user-table-filters-result';
 import {  type FormValueMap } from './list.types'
 import { ApiPublicTypes } from 'src/api'
 import dayjs from 'dayjs'
+import { ConfirmDialog } from 'src/components/custom-dialog';
 // ----------------------------------------------------------------------
 // 筛选常量
 const HIDE_COLUMNS = { category: false };
@@ -374,10 +375,42 @@ export function ConfigManagementView() {
     },
   ];
 
-  const getTogglableColumns = () =>
-    columns
-      .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
-      .map((column) => column.field);
+  const [openData, setOpenData] = useState<{
+    type: ApiPublicTypes.ConfigItemKey.NodeSaleSwitch | ApiPublicTypes.ConfigItemKey.NftSaleSwitch | undefined,
+    value: string
+  }>({
+    type: undefined,
+    value: ''
+  })
+  const [openStatusDialog, setOpenStatusDialog] = useState(false);
+
+  const handleConfirmStatusChange = useCallback(async () => {
+    setOpenStatusDialog(false)
+    const { type, value } = openData
+    const text = value === 'off' ? '关闭' : '开启'
+    const toastId = toast.loading(`正在${ text }中...`);
+
+    try {
+      const response = await updateConfig(type!, value)
+
+      if (response.code !== 0) return toast.error(text + '失败')
+      toast.success(text + '成功')
+      fetchConfigData()
+    } catch (error) {
+      console.error(`${ text }失败:`, error);
+      toast.error(`${ text }失败:`, { id: toastId });
+    } finally {
+      toast.dismiss(toastId)
+    }
+  }, [openData])
+
+  const handleConfirmOpen = useCallback(
+    (type: ApiPublicTypes.ConfigItemKey.NodeSaleSwitch | ApiPublicTypes.ConfigItemKey.NftSaleSwitch, value: string) => {
+      setOpenData({ type, value })
+      setOpenStatusDialog(true)
+    },
+    []
+  )
 
   return (
     <>
@@ -447,19 +480,12 @@ export function ConfigManagementView() {
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <Checkbox
+                      <Switch
                         checked={ formValues[ApiPublicTypes.ConfigItemKey.NodeSaleSwitch] === 'on' }
-                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.NodeSaleSwitch, e.target.checked ? 'on' : 'off') }
+                        onChange={ (e) => handleConfirmOpen(ApiPublicTypes.ConfigItemKey.NodeSaleSwitch, e.target.checked ? 'on' : 'off') }
                       />
                     </Box>
                   </Stack>
-                  <Button
-                    variant="contained"
-                    disabled={isLoading}
-                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.NodeSaleSwitch)}
-                  >
-                    保存
-                  </Button>
                 </Stack>
               </Stack>
             </Card>
@@ -519,19 +545,12 @@ export function ConfigManagementView() {
                       </Typography>
                     </Box>
                     <Box sx={{ minWidth: 250 }}>
-                      <Checkbox
+                      <Switch
                         checked={ formValues[ApiPublicTypes.ConfigItemKey.NftSaleSwitch] === 'on' }
-                        onChange={ (e) => handleInputChange(ApiPublicTypes.ConfigItemKey.NftSaleSwitch, e.target.checked ? 'on' : 'off') }
+                        onChange={ (e) => handleConfirmOpen(ApiPublicTypes.ConfigItemKey.NftSaleSwitch, e.target.checked ? 'on' : 'off') }
                       />
                     </Box>
                   </Stack>
-                  <Button
-                    variant="contained"
-                    disabled={isLoading}
-                    onClick={() => handleSaveConfig(ApiPublicTypes.ConfigItemKey.NftSaleSwitch)}
-                  >
-                    保存
-                  </Button>
                 </Stack>
               </Stack>
             </Card>
@@ -578,6 +597,24 @@ export function ConfigManagementView() {
           </Stack>
         </Box>
       </DashboardContent>
+
+      <ConfirmDialog
+        open={openStatusDialog}
+        onClose={() => setOpenStatusDialog(false)}
+        title="确认状态变更"
+        content={
+          `确定要${ openData.value === 'off' ? '关闭' : '开启' }吗?`
+        }
+        action={
+          <Button
+            variant="contained"
+            color='error'
+            onClick={handleConfirmStatusChange}
+          >
+            确认
+          </Button>
+        }
+      />
     </>
   );
 }

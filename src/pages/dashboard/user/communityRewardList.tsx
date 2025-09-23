@@ -6,7 +6,7 @@ import { CommunityRewardLogView } from 'src/sections/user/communityRewardLog/use
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `社区奖励列表 | 控制台 - ${CONFIG.appName}` };
+const metadata = { title: `社区奖励列表 - ${CONFIG.appName}` };
 
 export default function Page(props: { h?: boolean }) {
   const { h } = props;

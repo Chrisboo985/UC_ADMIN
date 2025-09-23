@@ -966,7 +966,10 @@ export const enum UserType {
   Normal = 'normal',
 
   /** 社区用户 */
-  Community = 'community'
+  Community = 'community',
+
+  /** 0号线 */
+  Line0 = 'line0'
 }
 
 export type getMemberListAPIResponse = {
@@ -989,6 +992,7 @@ export type getMemberListAPIResponse = {
     usdt_recharge_amount: number;
     withdraw_limit: number;
     type: UserType;
+    id: number;
   }>;
   total: number;
 }
@@ -999,8 +1003,6 @@ export type setUserTypeRequest = {
   member_id: number;
   type: UserType;
 }
-
-export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/member/set_type', data)
 
 
 export const getRechargeList = (data: {
@@ -1058,3 +1060,30 @@ export const getMenuCommunityAchievementList = (data: {
   }>;
   total: number;
 }>('/admin/member/network_community_purchase', data)
+
+export const setLine0UserType = (data: { member_id: number }) => axios.post('/admin/member/set_top_member', data)
+export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/member/set_type', data)
+export const getCommunityRewardsList = (data: {
+  date?: string;
+  member_address: string;
+  page: number;
+  page_size: number;
+}) => axios.post<{
+  list: Array<{
+    created_at_string: string;
+    dynamic_rate: string;
+    dynamic_reward_amount: string;
+    large_team_power: string;
+    level_up_reward_amount: string;
+    member_level: number;
+    open_virtual_region: boolean;
+    power: string;
+    small_team_all_power: string;
+    team_power: string;
+    uc_to_usdt: string;
+    member: {
+      address: string;
+    };
+  }>;
+  total: number;
+}>('/admin/member/community_reward', data)

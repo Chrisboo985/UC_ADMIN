@@ -30,6 +30,8 @@ export type NodeProps = OrgChartBaseNode & {
   remark?: string;
   all_stake_amount: string;
   loading?: boolean;
+  power?: string;
+  usdt_recharge_amount?: string;
 };
 
 const rootNode = {

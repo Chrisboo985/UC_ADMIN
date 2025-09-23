@@ -64,6 +64,8 @@ export const StandardNode = function StandardNode({
   sx,
   all_stake_amount,
   loading = false,
+  power,
+  usdt_recharge_amount
 }: NodeProps) {
   const my_all_stake_amount = Number(all_stake_amount);
   const theme = useTheme();
@@ -181,8 +183,8 @@ export const StandardNode = function StandardNode({
               noWrap
               sx={{ color: 'text.secondary', mb: 0.5 }}
             >
-              当前质押KSN:{' '}
-              {`${stake_amount && round(parseFloat(stake_amount || '0'), 2) ? `${round(parseFloat(stake_amount || '0'), 2)}` : '0'}`}
+              当前算力:{' '}
+              {`${power && round(parseFloat(power || '0'), 2) ? `${round(parseFloat(power || '0'), 2)}` : '0'}`}
             </Typography>
 
             <Typography
@@ -191,8 +193,8 @@ export const StandardNode = function StandardNode({
               noWrap
               sx={{ color: 'text.secondary', mb: 0.5 }}
             >
-              债券总认购（USDT）:{' '}
-              {`${total_bond && round(parseFloat(total_bond || '0'), 2) ? `${round(parseFloat(total_bond || '0'), 2)}` : '0'}`}
+              USDT充值数量:{' '}
+              {`${usdt_recharge_amount && round(parseFloat(usdt_recharge_amount || '0'), 2) ? `${round(parseFloat(usdt_recharge_amount || '0'), 2)}` : '0'}`}
             </Typography>
 
             {/* <Typography variant="caption" component="div" noWrap sx={{ color: 'text.secondary' }}>

@@ -430,8 +430,7 @@ export function OrganizationalChartView() {
       <CustomBreadcrumbs
         heading="网体查询"
         links={[
-          { name: '数据概览', href: paths.dashboard.root },
-          { name: '会员', href: paths.dashboard.user.root },
+          { name: '会员' },
           { name: '网体查询' },
         ]}
         sx={{ mb: { xs: 2, md: 5 } }}
