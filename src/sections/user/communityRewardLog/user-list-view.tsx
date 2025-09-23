@@ -247,7 +247,7 @@ export function CommunityRewardLogView(props: { h: boolean }) {
       field: 'created_at_string',
       headerName: '创建时间 ',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.created_at_string || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.created_at  ? params.row.created_at_string : '-' } />,
     },
   ];
 

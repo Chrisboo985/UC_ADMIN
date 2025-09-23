@@ -66,6 +66,7 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { EmptyContent } from 'src/components/empty-content';
 import { Label } from 'src/components/label';
+import dayjs from 'dayjs'
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -486,13 +487,13 @@ export function UserListView(props: { h: boolean }) {
       field: 'community_at_string',
       headerName: '社区成立时间',
       minWidth: 190,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at_string  || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at ?  params.row.community_at_string : '-'} />,
     },
     {
-      field: '$test',
+      field: 'top_member_at',
       headerName: '0号线成立时间',
       minWidth: 190,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.$test  || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.top_member_at ? dayjs.unix(params.row.top_member_at).format('YYYY-MM-DD HH:mm:ss') : '-' } />,
     },
     {
       field: 'power',
