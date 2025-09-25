@@ -573,17 +573,17 @@ export function UserListView(props: { h: boolean }) {
         />
       ),
     },
-    {
-      field: '$setVirtualZoneOpenStatus',
-      headerName: '开启虚拟大区',
-      minWidth: 120,
-      renderCell: (params) => (
-        <Switch
-          checked={ params.row.open_virtual_region }
-          onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
-        />
-      ),
-    },
+    // {
+    //   field: '$setVirtualZoneOpenStatus',
+    //   headerName: '开启虚拟大区',
+    //   minWidth: 120,
+    //   renderCell: (params) => (
+    //     <Switch
+    //       checked={ params.row.open_virtual_region }
+    //       onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
+    //     />
+    //   ),
+    // },
     // {
     //   type: 'actions',
     //   field: 'actions',
