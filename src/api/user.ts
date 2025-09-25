@@ -1098,7 +1098,7 @@ export const getCommunitySubsidy = (data: {
     community_member: {
       address: string;
     };
-    team_power?: {
+    top_member?: {
       address: string;
     };
     threshold: string;

@@ -107,7 +107,7 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
             // @ts-ignore
             item.$address = item.community_member.address
             // @ts-ignore
-            item.$line0Address = item.team_power?.address
+            item.$line0Address = item.top_member?.address
 
             return item
           }));
