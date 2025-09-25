@@ -1089,3 +1089,22 @@ export const getCommunityRewardsList = (data: {
   total: number;
 }>('/admin/member/community_reward', data)
 export const setVirtualZoneOpenStatus = (data: { member_id: number; open_virtual_region: boolean; }) => axios.post('/admin/member/update_virtual_region', data)
+export const getCommunitySubsidy = (data: {
+  member_address: string;
+  page: number;
+  page_size: number;
+}) => axios.post<{
+  list: Array<{
+    community_member: {
+      address: string;
+    };
+    team_power?: {
+      address: string;
+    };
+    threshold: string;
+    reward: string;
+    created_at: number;
+    created_at_string: string;
+  }>;
+  total: number;
+}>('/admin/member/community_subsidy', data)

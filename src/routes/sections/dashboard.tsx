@@ -224,7 +224,7 @@ export const dashboardRoutes = [
           // { title: '社区债券购买记录', path: 'performance-bond-purchase', element: <PerformanceBondPurchase /> },
           // { title: '社区债券购买汇总', path: 'performance-bond-purchase-gather', element: <PerformanceBondPurchaseGather /> },
           // { title: '社区出入金汇总', path: 'performance-bond-with-swap', element: <PerformanceBondWithSwap /> },
-          { title: '社区奖励查询', path: 'communityRewardQuery', element: <CommunityRewardQueryPage /> },
+          { title: '社区津贴列表', path: 'communityRewardQuery', element: <CommunityRewardQueryPage /> },
           { title: '社区奖励列表', path: 'communityRewardList', element: <CommunityRewardListPage /> },
           // { title: '团队业绩查询', path: 'teamPerformanceInquiry', element: <TeamPerformanceInquiryPage /> },
           // { path: 'new', element: <UserCreatePage /> },

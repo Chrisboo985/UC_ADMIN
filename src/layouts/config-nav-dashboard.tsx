@@ -92,7 +92,7 @@ export const navData = [
           // { title: 'Cards', path: paths.dashboard.user.cards },
           { title: '会员列表', path: paths.dashboard.user.list },
           { title: '社区业绩列表', path: paths.dashboard.user.menuCommunityAchievementList },
-          // { title: '社区奖励查询', path: paths.dashboard.user.communityRewardQuery },
+          { title: '社区津贴列表', path: paths.dashboard.user.communityRewardQuery },
           { title: '社区奖励列表', path: paths.dashboard.user.communityRewardList },
           // { title: '团队业绩查询', path: paths.dashboard.user.teamPerformanceInquiry },
           { title: '网体查询', path: paths.dashboard.user.organizationalChart },
