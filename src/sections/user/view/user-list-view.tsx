@@ -567,23 +567,23 @@ export function UserListView(props: { h: boolean }) {
       minWidth: 120,
       renderCell: (params) => (
         <Switch
-          disabled={ params.row.top_member }
-          checked={ params.row.top_member }
+          disabled={ params.row.is_top_member }
+          checked={ params.row.is_top_member }
           onChange={ () => handleUserTypeChange(UserType.Line0, params.row) }
         />
       ),
     },
-    // {
-    //   field: '$setVirtualZoneOpenStatus',
-    //   headerName: '开启虚拟大区',
-    //   minWidth: 120,
-    //   renderCell: (params) => (
-    //     <Switch
-    //       checked={ params.row.open_virtual_region }
-    //       onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
-    //     />
-    //   ),
-    // },
+    {
+      field: '$setVirtualZoneOpenStatus',
+      headerName: '是否虚拟大区',
+      minWidth: 120,
+      renderCell: (params) => ( <CellWithTooltipCopy value={params.row.open_virtual_region ? '是' : '否' } />
+        // <Switch
+        //   checked={ params.row.open_virtual_region }
+        //   onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
+        // />
+      ),
+    },
     // {
     //   type: 'actions',
     //   field: 'actions',
