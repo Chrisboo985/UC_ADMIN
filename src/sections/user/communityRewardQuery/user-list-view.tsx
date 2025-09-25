@@ -180,13 +180,13 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
     {
       field: '$address',
       headerName: '社区地址',
-      minWidth: 400,
+      minWidth: 410,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.$address || '-'} />,
     },
     {
       field: '$line0Address',
       headerName: '0号线地址',
-      minWidth: 400,
+      minWidth: 410,
       renderCell: (params) => <CellWithTooltipCopy value={params.row.$line0Address || '-'} />,
     },
     {
