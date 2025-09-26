@@ -173,7 +173,13 @@ export function NodeOrderListView(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           setTotalPurchase(data?.total_purchase)
-          setFilteredData(data?.list || []);
+          setFilteredData((data?.list || []).map(item => {
+            item.$address = item.member.address
+            item.$productName = item.product.name
+            item.$txAt = dayjs(item.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss')
+
+            return item
+          }));
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -222,24 +228,24 @@ export function NodeOrderListView(props: { h: boolean }) {
     [filtersForEdit.setState, filtersForEdit.state]
   );
 
-  // const CustomToolbarCallback = useCallback(
-  //   () => (
-  //     <CustomToolbar
-  //       canReset={canReset}
-  //       filtersForEdit={memoizedFiltersForEdit}
-  //       selectedRowIds={selectedRowIds}
-  //       setFilterButtonEl={setFilterButtonEl}
-  //       filteredResults={filteredData.length}
-  //     />
-  //   ),
-  //   [
-  //     canReset,
-  //     memoizedFiltersForEdit,
-  //     selectedRowIds,
-  //     filteredData,
-  //     setFilterButtonEl,
-  //   ]
-  // );
+  const CustomToolbarCallback = useCallback(
+    () => (
+      <CustomToolbar
+        canReset={canReset}
+        filtersForEdit={memoizedFiltersForEdit}
+        selectedRowIds={selectedRowIds}
+        setFilterButtonEl={setFilterButtonEl}
+        filteredResults={filteredData.length}
+      />
+    ),
+    [
+      canReset,
+      memoizedFiltersForEdit,
+      selectedRowIds,
+      filteredData,
+      setFilterButtonEl,
+    ]
+  );
 
   const columns: GridColDef[] = [
     {
@@ -249,10 +255,10 @@ export function NodeOrderListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.member_id || '-'} />,
     },
     {
-      field: 'member.address',
+      field: '$address',
       headerName: '用户地址',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.member.address || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.$address || '-'} />,
     },
     {
       field: 'hash',
@@ -261,10 +267,10 @@ export function NodeOrderListView(props: { h: boolean }) {
       renderCell: (params) => <CellWithTooltipCopy value={params.row.hash || '-'} />,
     },
     {
-      field: 'product.name',
+      field: '$productName',
       headerName: '产品名称',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.product.name || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.$productName || '-'} />,
     },
     {
       field: 'price',
@@ -303,10 +309,10 @@ export function NodeOrderListView(props: { h: boolean }) {
     //   renderCell: (params) => <CellWithTooltipCopy value={String(params.row.price ?? '-')} />,
     // },
     {
-      field: 'tx_at',
+      field: '$txAt',
       headerName: '交易时间',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={dayjs(params.row.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss') || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.$txAt || '-'} />,
     },
     {
       field: 'created_at_string',
@@ -474,10 +480,10 @@ export function NodeOrderListView(props: { h: boolean }) {
             paginationModel={{ page: pagination.page - 1, pageSize: pagination.pageSize }}
             columnVisibilityModel={columnVisibilityModel}
             onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-            // slots={{
-            //   toolbar: CustomToolbarCallback as GridSlots['toolbar'],
-            //   noResultsOverlay: () => <EmptyContent title="返回数据为空" />,
-            // }}
+            slots={{
+              toolbar: CustomToolbarCallback as GridSlots['toolbar'],
+              noResultsOverlay: () => <EmptyContent title="返回数据为空" />,
+            }}
             slotProps={{
               panel: { anchorEl: filterButtonEl },
               toolbar: { setFilterButtonEl },
@@ -510,39 +516,39 @@ export function NodeOrderListView(props: { h: boolean }) {
 // ----------------------------------------------------------------------
 
 // 自定义工具栏组件
-// interface CustomToolbarProps {
-//   canReset: boolean;
-//   filteredResults: number;
-//   selectedRowIds: GridRowSelectionModel;
-//   filtersForEdit: any;
-//   setFilterButtonEl: React.Dispatch<React.SetStateAction<HTMLButtonElement | null>>;
-// }
+interface CustomToolbarProps {
+  canReset: boolean;
+  filteredResults: number;
+  selectedRowIds: GridRowSelectionModel;
+  filtersForEdit: any;
+  setFilterButtonEl: React.Dispatch<React.SetStateAction<HTMLButtonElement | null>>;
+}
 
-// function CustomToolbar({
-//   filtersForEdit,
-//   canReset,
-//   selectedRowIds,
-//   filteredResults,
-//   setFilterButtonEl,
-// }: CustomToolbarProps) {
-//   return (
-//     <>
-//       <GridToolbarContainer>
-//         <Stack
-//           spacing={1}
-//           flexGrow={1}
-//           direction="row"
-//           alignItems="center"
-//           justifyContent="flex-end"
-//         >
-//           <GridToolbarColumnsButton />
-//           <GridToolbarFilterButton ref={setFilterButtonEl} />
-//           <GridToolbarExport />
-//         </Stack>
-//       </GridToolbarContainer>
-//       {canReset && (
-//         <UserTableFiltersResult filters={filtersForEdit} totalResults={0} sx={{ p: 2.5, pt: 0 }} />
-//       )}
-//     </>
-//   );
-// }
+function CustomToolbar({
+  filtersForEdit,
+  canReset,
+  selectedRowIds,
+  filteredResults,
+  setFilterButtonEl,
+}: CustomToolbarProps) {
+  return (
+    <>
+      <GridToolbarContainer>
+        <Stack
+          spacing={1}
+          flexGrow={1}
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-end"
+        >
+          <GridToolbarColumnsButton />
+          <GridToolbarFilterButton ref={setFilterButtonEl} />
+          <GridToolbarExport />
+        </Stack>
+      </GridToolbarContainer>
+      {canReset && (
+        <UserTableFiltersResult filters={filtersForEdit} totalResults={0} sx={{ p: 2.5, pt: 0 }} />
+      )}
+    </>
+  );
+}
