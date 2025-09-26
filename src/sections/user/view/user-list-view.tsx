@@ -110,7 +110,7 @@ const HIDE_COLUMNS = { category: false };
 
 const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 
-type Row = getMemberListAPIResponse['list'][number] & { $parentAddress: string | undefined; }
+type Row = getMemberListAPIResponse['list'][number]
 
 const userTypeItems: UserTypeItem[] = [
   // { label: '全部', value: UserType.All },
@@ -200,8 +200,7 @@ export function UserListView(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           // 如果为空，需要设置默认值
-          const list = (data?.list || []).map(item => Object.assign(item, { $parentAddress: item.parent_member?.address}))
-          setFilteredData(list);
+          setFilteredData(data?.list || []);
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -395,14 +394,14 @@ export function UserListView(props: { h: boolean }) {
       field: 'address',
       headerName: '地址 ',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || '-'} />
     },
     {
-      field: '$parentAddress',
+      field: '$parentMemberAddress',
       headerName: '上级地址',
       minWidth: 190,
       renderCell: (params) => {
-        const value = params.row.$parentAddress;
+        const value = params.row.parent_member?.address;
         if (!value) return <CellWithTooltipCopy value="-" />;
 
         return (
@@ -428,126 +427,142 @@ export function UserListView(props: { h: boolean }) {
           </Box>
         );
       },
+      valueFormatter: (value, row) => row.parent_member?.address,
     },
     {
       field: 'dynamic_reward',
       headerName: '动态奖',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.dynamic_reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
       field: 'static_reward',
       headerName: 'nft 静态奖励',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.static_reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
       field: 'level_up_reward',
       headerName: '晋级奖励',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.level_up_reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
       field: 'receive_reward_usdt',
       headerName: '已领取奖励usdt价值',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward_usdt || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
       field: 'receive_reward',
       headerName: '已领取奖励',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.receive_reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
       field: 'withdraw_limit',
       headerName: '提现额度',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.withdraw_limit || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || '-'} />
     },
     {
       field: 'level',
       headerName: '等级',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.level || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || '-'} />
     },
     {
       field: 'type',
       headerName: '用户类型',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={ userTypeItems.find(item => item.value === params.row.type)?.label || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ userTypeItems.find(item => item.value === value)?.label || '-'} />,
+      valueFormatter: (value) => userTypeItems.find(item => item.value === value)?.label
     },
     {
       field: 'community_usdt_recharge_amount',
       headerName: '社区usdt充值业绩',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_usdt_recharge_amount  || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />
     },
     {
-      field: 'community_at_string',
+      field: '$communityAtString',
       headerName: '社区成立时间',
       minWidth: 190,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at ?  params.row.community_at_string : '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ params.row.community_at ? params.row.community_at_string : '-'} />,
+      valueFormatter: (value, row) => row.community_at ? row.community_at_string : ''
     },
     {
       field: 'top_member_at',
       headerName: '0号线成立时间',
       minWidth: 190,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.top_member_at ? dayjs.unix(params.row.top_member_at).format('YYYY-MM-DD HH:mm:ss') : '-' } />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value ? dayjs.unix(value).format('YYYY-MM-DD HH:mm:ss') : '-' } />,
+      valueFormatter: (value) => value ? dayjs.unix(value).format('YYYY-MM-DD HH:mm:ss') : ''
     },
     {
       field: 'power',
       headerName: '算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'team_power',
       headerName: '团队算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'order_count',
       headerName: '节点认购数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.order_count || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'usdt_recharge_amount',
       headerName: 'USDT充值数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.usdt_recharge_amount || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'network_order_count',
       headerName: '团队节点认购数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.network_order_count || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'order_reward',
       headerName: '认购奖励',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.order_reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'team_usdt_recharge_amount',
       headerName: '团队USDT充值数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_usdt_recharge_amount || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'ip',
       headerName: 'IP地址',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.ip || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'remark',
       headerName: '备注',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
+    },
+    {
+      field: 'open_virtual_region',
+      headerName: '是否虚拟大区',
+      minWidth: 120,
+      renderCell: (value) => ( <CellWithTooltipCopy value={ value ? '是' : '否' } />
+        // <Switch
+        //   checked={ params.row.open_virtual_region }
+        //   onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
+        // />
+      ),
+      valueFormatter: (value) => value ? '是' : '否'
     },
     {
       field: '$setCommunityUser',
@@ -560,6 +575,7 @@ export function UserListView(props: { h: boolean }) {
           onChange={ () => handleUserTypeChange(UserType.Community, params.row) }
         />
       ),
+      valueFormatter: (value, row) => row.type === UserType.Community ? '是' : '否',
     },
     {
       field: '$setLine0User',
@@ -572,17 +588,7 @@ export function UserListView(props: { h: boolean }) {
           onChange={ () => handleUserTypeChange(UserType.Line0, params.row) }
         />
       ),
-    },
-    {
-      field: '$setVirtualZoneOpenStatus',
-      headerName: '是否虚拟大区',
-      minWidth: 120,
-      renderCell: (params) => ( <CellWithTooltipCopy value={params.row.open_virtual_region ? '是' : '否' } />
-        // <Switch
-        //   checked={ params.row.open_virtual_region }
-        //   onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
-        // />
-      ),
+      valueFormatter: (value, row) => row.is_top_member ? '是' : '否',
     },
     // {
     //   type: 'actions',

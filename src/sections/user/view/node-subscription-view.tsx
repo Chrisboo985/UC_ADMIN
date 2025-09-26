@@ -110,7 +110,7 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 
 // ----------------------------------------------------------------------
 
-type Row = (getNodeSubscriptionLogListResponse['list'][number] & { $productName: string; })
+type Row = getNodeSubscriptionLogListResponse['list'][number]
 
 // 用户列表视图主组件
 export function NodeSubscriptionView(props: { h: boolean }) {
@@ -238,12 +238,7 @@ export function NodeSubscriptionView(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           // 如果为空，需要设置默认值
-          setFilteredData((data?.list || []).map(item => {
-            // @ts-ignore
-            item.$productName = item.product.name;
-
-            return item as Row
-          }));
+          setFilteredData(data?.list || []);
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -660,44 +655,45 @@ export function NodeSubscriptionView(props: { h: boolean }) {
       field: 'address',
       headerName: '地址 ',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.address || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'hash',
       headerName: '交易哈希',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.hash || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'tx_at_string',
       headerName: '交易时间',
       minWidth: 200,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.tx_at_string || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
 
     {
       field: '$productName',
       headerName: '产品名称 ',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$productName || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.product.name || '-'} />,
+      valueFormatter: (value, row) => row.product.name
     },
     {
       field: 'quantity',
       headerName: '购买数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.quantity || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'amount',
       headerName: '购买金额',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.amount || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'remark',
       headerName: '备注',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.remark || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
   ];
 

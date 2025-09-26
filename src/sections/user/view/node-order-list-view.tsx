@@ -173,13 +173,7 @@ export function NodeOrderListView(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           setTotalPurchase(data?.total_purchase)
-          setFilteredData((data?.list || []).map(item => {
-            item.$address = item.member.address
-            item.$productName = item.product.name
-            item.$txAt = dayjs(item.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss')
-
-            return item
-          }));
+          setFilteredData(data?.list || []);
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -252,73 +246,76 @@ export function NodeOrderListView(props: { h: boolean }) {
       field: 'member_id',
       headerName: '会员ID',
       minWidth: 80,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.member_id || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
-      field: '$address',
+      field: '$memberAddress',
       headerName: '用户地址',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$address || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.member.address || '-'} />,
+      valueFormatter: (value, row) => row.member.address
     },
     {
       field: 'hash',
       headerName: '订单哈希',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.hash || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: '$productName',
       headerName: '产品名称',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$productName || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.product.name || '-'} />,
+      valueFormatter: (value, row) => row.product.name
     },
     {
       field: 'price',
       headerName: '产品价格',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.price || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'quantity',
       headerName: '购买数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={String(params.row.quantity ?? '-')} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={String(value ?? '-')} />,
     },
     {
       field: 'amount',
       headerName: '购买总金额',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={String(params.row.amount ?? '-')} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={String(value ?? '-')} />,
     },
     {
       field: 'power',
       headerName: '算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={String(params.row.power ?? '-')} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={String(value ?? '-')} />,
     },
     {
       field: 'withdraw_limit',
       headerName: '提现限制',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={String(params.row.withdraw_limit ?? '-')} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={String(value ?? '-')} />,
     },
     // {
     //   field: 'price',
     //   headerName: '价格',
     //   minWidth: 170,
-    //   renderCell: (params) => <CellWithTooltipCopy value={String(params.row.price ?? '-')} />,
+    //   renderCell: ({ value }) => <CellWithTooltipCopy value={String(value ?? '-')} />,
     // },
     {
       field: '$txAt',
       headerName: '交易时间',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={ params.row.$txAt || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={ dayjs(params.row.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss') || '-'} />,
+      valueFormatter: (valuem, row) => dayjs(row.tx_at * 1000).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       field: 'created_at_string',
       headerName: '创建时间',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.created_at_string || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
   ];
 

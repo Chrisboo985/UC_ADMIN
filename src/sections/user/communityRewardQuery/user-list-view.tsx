@@ -103,14 +103,7 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           // 如果为空，需要设置默认值
-          setFilteredData((data?.list || []).map(item => {
-            // @ts-ignore
-            item.$address = item.community_member.address
-            // @ts-ignore
-            item.$line0Address = item.top_member?.address
-
-            return item
-          }));
+          setFilteredData((data?.list || []));
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -178,34 +171,37 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
 
   const columns: GridColDef[] = [
     {
-      field: '$address',
+      field: '$communityMemberAddress',
       headerName: '社区地址',
       minWidth: 410,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$address || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.community_member.address || '-'} />,
+      valueFormatter: (value, row) => row.community_member.address,
     },
     {
-      field: '$line0Address',
+      field: '$topMemberAddress',
       headerName: '0号线地址',
       minWidth: 410,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$line0Address || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.top_member?.address || '-'} />,
+      valueFormatter: (value, row) => row.top_member?.address
     },
     {
       field: 'threshold',
       headerName: '业绩标准',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.threshold || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'reward',
       headerName: '奖励数量',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.reward || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
-      field: 'created_at_string',
+      field: '$createdAtString',
       headerName: '奖励时间',
       minWidth: 200,
       renderCell: (params) => <CellWithTooltipCopy value={ params.row.created_at ? params.row.created_at_string : '-'} />,
+      valueFormatter: (valeu, row) => row.created_at ? row.created_at_string : ''
     }
   ];
 

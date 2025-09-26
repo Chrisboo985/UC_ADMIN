@@ -204,25 +204,26 @@ export function MenuCommunityAchievementListView(props: { h: boolean }) {
       field: 'member_address',
       headerName: '用户地址',
       minWidth: 500,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.member_address || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || '-'} />,
     },
     {
       field: 'is_top_member',
       headerName: '是否是0号线用户 ',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.is_top_member ? '是' : '否'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value ? '是' : '否'} />,
+      valueFormatter: (value) => value ? '是' : '否',
     },
     {
       field: 'purchase_amount',
       headerName: '认购金额（USDT）',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.purchase_amount || 0} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || 0} />,
     },
     {
       field: 'purchase_count',
       headerName: '认购节点数量',
       minWidth: 300,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.purchase_count || 0} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={value || 0} />,
     }
   ];
 

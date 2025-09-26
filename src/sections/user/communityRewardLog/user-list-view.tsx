@@ -104,12 +104,7 @@ export function CommunityRewardLogView(props: { h: boolean }) {
         const { data, code } = apiResult;
         if (code === 0) {
           // 如果为空，需要设置默认值
-          setFilteredData((data?.list || []).map(item => {
-            // @ts-ignore
-            item.$address = item.member.address
-
-            return item
-          }));
+          setFilteredData(data?.list || []);
           setTotalCount(data?.total || 0);
         } else {
           toast.error(apiResult.message);
@@ -178,76 +173,79 @@ export function CommunityRewardLogView(props: { h: boolean }) {
 
   const columns: GridColDef[] = [
     {
-      field: '$address',
+      field: '$memberAddress',
       headerName: '用户地址 ',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.$address || '-'} />,
+      renderCell: (params) => <CellWithTooltipCopy value={params.row.member.address || '-'} />,
+      valueFormatter: (value, row) => row.member.address
     },
     {
       field: 'power',
       headerName: '个人算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'team_power',
       headerName: '团队算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.team_power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'large_team_power',
       headerName: '大团队算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.large_team_power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'small_team_all_power',
       headerName: '小团队总算力',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.small_team_all_power || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'dynamic_rate',
       headerName: '动态奖占比',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.dynamic_rate || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'dynamic_reward_amount',
       headerName: '动态奖',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.dynamic_reward_amount || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'level_up_reward_amount',
       headerName: '晋级奖',
       minWidth: 200,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.level_up_reward_amount || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'member_level',
       headerName: '会员等级',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.member_level || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
       field: 'open_virtual_region',
       headerName: '是否已开启虚拟大区',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.open_virtual_region ? '已开启' : '未开启' } />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value ? '已开启' : '未开启' } />,
+      valueFormatter: (value) => value ? '已开启' : '未开启',
     },
     {
       field: 'uc_to_usdt',
       headerName: 'uc兑USDT比率',
       minWidth: 170,
-      renderCell: (params) => <CellWithTooltipCopy value={params.row.uc_to_usdt || '-'} />,
+      renderCell: ({ value }) => <CellWithTooltipCopy value={ value || '-'} />,
     },
     {
-      field: 'created_at_string',
+      field: '$createdAtString',
       headerName: '创建时间 ',
       minWidth: 170,
       renderCell: (params) => <CellWithTooltipCopy value={ params.row.created_at  ? params.row.created_at_string : '-' } />,
+      valueFormatter: (value, row) => row.created_at ? row.created_at_string : '-',
     },
   ];
 
