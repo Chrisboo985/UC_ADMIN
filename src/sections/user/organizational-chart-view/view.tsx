@@ -51,7 +51,9 @@ class NodeManager {
   }
 
   async fetchNode(params: any): Promise<any> {
-    const cacheKey = JSON.stringify(params);
+    // 将 __v 仅用于缓存键，避免污染真实 API 参数
+    const { __v, ...apiParams } = params || {};
+    const cacheKey = JSON.stringify({ ...apiParams, __v });
     if (this.dataCache.has(cacheKey)) {
       const cacheEntry = this.dataCache.get(cacheKey);
       if (cacheEntry && cacheEntry.expiredAt > Date.now()) {
@@ -66,7 +68,7 @@ class NodeManager {
       }
     }
 
-    const promise = getMemberNetworkAPI(params).then((response) => {
+    const promise = getMemberNetworkAPI(apiParams).then((response) => {
       const data = response.data;
       this.dataCache.set(cacheKey, { data, expiredAt: Date.now() + EXPIRED_TIME });
       this.requestStatus.delete(cacheKey);
@@ -77,8 +79,8 @@ class NodeManager {
     return promise;
   }
 
-  isLoading(id: number): boolean {
-    const cacheKey = JSON.stringify({ id });
+  isLoading(parentId: number, version?: number): boolean {
+    const cacheKey = JSON.stringify({ parent_id: parentId, page: PAGINATION.page, page_size: PAGINATION.pageSize, __v: version });
     return this.requestStatus.has(cacheKey);
   }
 
@@ -98,6 +100,17 @@ function useTransform() {
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const rafIdRef = useRef<number | null>(null);
+
+  const setTransformRaf = useCallback((updater: (prev: typeof transform) => typeof transform) => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+    }
+    rafIdRef.current = requestAnimationFrame(() => {
+      setTransform((prev) => updater(prev));
+      rafIdRef.current = null;
+    });
+  }, []);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLDivElement>) => {
@@ -141,14 +154,16 @@ function useTransform() {
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (isDragging.current) {
-        setTransform((prevTransform) => ({
+        const nextX = e.clientX - dragStart.current.x;
+        const nextY = e.clientY - dragStart.current.y;
+        setTransformRaf((prevTransform) => ({
           ...prevTransform,
-          x: e.clientX - dragStart.current.x,
-          y: e.clientY - dragStart.current.y,
+          x: nextX,
+          y: nextY,
         }));
       }
     },
-    [transform]
+    [setTransformRaf]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -174,15 +189,16 @@ function useTransform() {
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
       if (isDragging.current) {
-        setTransform((prevTransform) => ({
+        const nextX = e.touches[0].clientX - dragStart.current.x;
+        const nextY = e.touches[0].clientY - dragStart.current.y;
+        setTransformRaf((prevTransform) => ({
           ...prevTransform,
-
-          x: e.touches[0].clientX - dragStart.current.x,
-          y: e.touches[0].clientY - dragStart.current.y,
+          x: nextX,
+          y: nextY,
         }));
       }
     },
-    [transform]
+    [setTransformRaf]
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -229,17 +245,47 @@ export function OrganizationalChartView() {
     setTransform,
   } = useTransform();
   const nodeManager = useMemo(() => new NodeManager(), []);
+  // 请求版本号：每次搜索/初始化都自增，用于隔离缓存与忽略过期响应
+  const requestVersionRef = useRef(0);
+  // IntersectionObserver 管理（避免在缩放/拖拽时频繁重建）
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  // 记录已 observe 的具体元素，避免 DOM 重建后因复用 id 而错过新元素
+  const observedElementsRef = useRef<WeakSet<Element>>(new WeakSet());
+  const mapDataRef = useRef(mapData);
+  useEffect(() => {
+    mapDataRef.current = mapData;
+  }, [mapData]);
+
+  // NOTE: 可见性检查逻辑将放在 fetchNodes 定义之后
+
+  // 绑定容器内新出现的 .org-node 到 observer
+  const observeNewNodes = useCallback(() => {
+    const container = containerRef.current as HTMLElement;
+    const observer = observerRef.current;
+    if (!container || !observer) return;
+    const nodes = container.querySelectorAll('.org-node');
+    nodes.forEach((node) => {
+      if (!observedElementsRef.current.has(node)) {
+        observer.observe(node);
+        observedElementsRef.current.add(node);
+      }
+    });
+  }, [containerRef]);
 
   const fetchNodes = useCallback(
     async function fetchNodes(parentId: number) {
       setIsLoading(true);
       try {
+        const currentVersion = requestVersionRef.current;
         const params = {
           parent_id: parentId,
           page: PAGINATION.page,
           page_size: PAGINATION.pageSize,
+          __v: currentVersion,
         };
         const data = await nodeManager.fetchNode(params);
+        // 忽略来自旧版本的迟到响应
+        if (currentVersion !== requestVersionRef.current) return;
         console.log(`Fetched nodes for parent ${parentId}:`, data.list);
         updateSreenNodes(data, parentId);
       } catch (error) {
@@ -250,6 +296,36 @@ export function OrganizationalChartView() {
     },
     [nodeManager]
   );
+
+  // 基于 boundingClientRect 的可见性检查（用于 transform 平移/缩放场景下触发懒加载）
+  const checkVisibleAndFetch = useCallback(() => {
+    const container = containerRef.current as HTMLElement;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const nodes = container.querySelectorAll('.org-node');
+    const visibleNodeIds: number[] = [];
+    nodes.forEach((node) => {
+      const rect = (node as HTMLElement).getBoundingClientRect();
+      const intersectX = Math.max(0, Math.min(containerRect.right, rect.right) - Math.max(containerRect.left, rect.left));
+      const intersectY = Math.max(0, Math.min(containerRect.bottom, rect.bottom) - Math.max(containerRect.top, rect.top));
+      const intersectArea = intersectX * intersectY;
+      const nodeArea = rect.width * rect.height;
+      const ratio = nodeArea > 0 ? intersectArea / nodeArea : 0;
+      if (ratio >= 0.1) {
+        const id = parseInt((node as HTMLElement).getAttribute('data-id') || '0', 10);
+        if (id > 0) visibleNodeIds.push(id);
+      }
+    });
+    visibleNodeIds.forEach((nodeId) => {
+      if (!mapDataRef.current.has(nodeId)) {
+        fetchNodes(nodeId);
+      }
+    });
+  }, [fetchNodes]);
+
+  const debouncedCheckVisibleAndFetch = useRef(debounce(() => {
+    checkVisibleAndFetch();
+  }, 120));
 
   function updateSreenNodes(data: any, parentId: number) {
     console.log('Updating screen nodes...',data);
@@ -265,10 +341,13 @@ export function OrganizationalChartView() {
     const buildTree = (parentId = rootId) => {
       const nodes = mapData.get(parentId) || [];
       console.log(`Building tree for parent ${parentId}...`,nodes);
-      return nodes.map((node: any) => ({
-        ...node,
-        children: buildTree(node.id).length > 0 ? buildTree(node.id) : null,
-      }));
+      return nodes.map((node: any) => {
+        const child = buildTree(node.id);
+        return {
+          ...node,
+          children: child.length > 0 ? child : null,
+        };
+      });
     };
     setTreeData((prev) => ({
       ...prev,
@@ -286,7 +365,16 @@ export function OrganizationalChartView() {
 
     console.log("查出来的父级节点",node)
     if (node) {
-      setTreeData({ ...node, children: [] });
+      // 新一轮搜索：重置缓存与数据，并自增版本号
+      requestVersionRef.current += 1;
+      nodeManager.reset();
+      setMapData(new Map());
+      setTreeData({
+        id: Number((node as any).id),
+        address: (node as any).address ?? '',
+        parent_id: Number((node as any).parent_id ?? 0),
+        children: [],
+      });
       setRootId(Number(node.id));
       fetchNodes(Number(node.id));
     }
@@ -313,7 +401,15 @@ export function OrganizationalChartView() {
     getRootNode({ id: 1 })
       .then((node) => {
         if (node) {
-          setTreeData({ ...node, children: [] });
+          requestVersionRef.current += 1;
+          nodeManager.reset();
+          setMapData(new Map());
+          setTreeData({
+            id: Number((node as any).id),
+            address: (node as any).address ?? '',
+            parent_id: Number((node as any).parent_id ?? 0),
+            children: [],
+          });
           setRootId(node.id);
         }
       })
@@ -352,7 +448,10 @@ export function OrganizationalChartView() {
   // 监听根节点卡片包裹元素的父级节点宽高变化
   useEffect(() => {
     const container = containerRef.current as HTMLElement;
-    const treeRootWrapper = container.querySelector('.org-node')!.parentElement as HTMLDivElement;
+    if (!container) return;
+    const firstNode = container.querySelector('.org-node') as HTMLElement | null;
+    if (!firstNode || !firstNode.parentElement || !firstNode.parentElement.parentElement) return;
+    const treeRootWrapper = firstNode.parentElement as HTMLDivElement;
     const treeRootWrapperParent = treeRootWrapper.parentElement as HTMLLIElement;
     const observer = new MutationObserver((event) => {
       // console.log('MutationObserver:', event);
@@ -362,6 +461,9 @@ export function OrganizationalChartView() {
           setMutationObserverTggerCount((prev) => prev + 1);
         }
       }
+      // 子树结构变化后，尝试绑定新节点并触发一次可见性检查
+      observeNewNodes();
+      debouncedCheckVisibleAndFetch.current();
     });
     observer.observe(treeRootWrapperParent, {
       attributes: true, // 监听属性变化
@@ -379,18 +481,29 @@ export function OrganizationalChartView() {
 
   useEffect(generateTreeData, [mapData]);
 
+  // 在 transform 变更（平移/缩放）后，进行一次节流的可见性检查
+  useEffect(() => {
+    debouncedCheckVisibleAndFetch.current();
+  }, [transform]);
+
+  // 创建单例 IntersectionObserver（仅依赖 fetchNodes 的稳定引用）
   useEffect(() => {
     const container = containerRef.current as HTMLElement;
-    const observer = new IntersectionObserver(
+    if (!container) return;
+    // 先断开可能存在的旧 observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observedElementsRef.current = new WeakSet();
+    }
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         const visibleNodeIds = entries
           .filter((entry) => entry.isIntersecting)
           .map((entry) => parseInt(entry.target.getAttribute('data-id') || '0', 10))
           .filter((id) => id > 0);
-        console.log('visibleNodeIds:', visibleNodeIds);
-        // 处理可见节点的业务逻辑
+        // 可见节点触发懒加载（基于最新 mapDataRef）
         visibleNodeIds.forEach((nodeId) => {
-          if (!mapData.has(nodeId)) {
+          if (!mapDataRef.current.has(nodeId)) {
             fetchNodes(nodeId);
           }
         });
@@ -402,16 +515,24 @@ export function OrganizationalChartView() {
       }
     );
 
-    const nodes = container.querySelectorAll('.org-node');
-    nodes.forEach((node) => observer.observe(node));
+    // 创建后立即绑定当前已有的节点
+    observeNewNodes();
 
     return () => {
-      nodes.forEach((node) => observer.unobserve(node));
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observedElementsRef.current = new WeakSet();
+      }
     };
-  }, [mapData, transform.scale, isDragging.current, fetchNodes]);
+  }, [fetchNodes, observeNewNodes]);
+
+  // 当 mapData 变化时，扫描并绑定新的 .org-node（减少重复绑定）
+  useEffect(() => {
+    observeNewNodes();
+  }, [mapData, observeNewNodes]);
 
   const renderNode = useCallback((props: NodeProps) => {
-    const loading = nodeManager.isLoading(parseInt((props.id ?? '0').toString(), 10));
+    const loading = nodeManager.isLoading(parseInt((props.id ?? '0').toString(), 10), requestVersionRef.current);
     console.log('renderNode:', props);
     return (
       <StandardNode
