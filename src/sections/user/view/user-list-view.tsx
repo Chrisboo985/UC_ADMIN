@@ -113,7 +113,7 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 type Row = getMemberListAPIResponse['list'][number]
 
 const userTypeItems: UserTypeItem[] = [
-  // { label: '全部', value: UserType.All },
+  { label: '全部', value: UserType.All },
   // { label: '普通用户', value: UserType.Normal },
   { label: '社区用户', value: UserType.Community },
 ]
