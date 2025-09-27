@@ -32,7 +32,7 @@ import { EmptyContent } from 'src/components/empty-content';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { CellWithTooltipCopy } from '../user-table-cell';
 import React from 'react'
-import { getCommunitySubsidy } from 'src/api/user';
+import { getCommunitySubsidy, communitySubsidySend } from 'src/api/user';
 import { type Item, type Prams } from './user-list-view.types'
 import type { Theme, SxProps } from '@mui/material/styles';
 import dayjs from 'dayjs';
@@ -41,6 +41,8 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import type { IDatePickerControl } from 'src/types/common';
 import { fIsAfter } from 'src/utils/format-time';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { ConfirmDialog } from 'src/components/custom-dialog'
+import { Switch } from '@mui/material';
 
 import Chip from '@mui/material/Chip';
 
@@ -73,6 +75,7 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
 
   const params = useSetState<Prams>({
     member_address: '',
+    top_member_address: '',
     page: 1,
     page_size: 10
   })
@@ -91,7 +94,7 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
 
   const [usersLoading, setUsersLoading] = useState<true | false>(false);
   // 筛选条件是否能够重置
-  const canReset = !!params.state.member_address
+  const canReset = !!params.state.member_address || !!params.state.top_member_address
 
 
   // 获取用户列表
@@ -125,17 +128,25 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
   const handleFilterData = () => {
     console.log('应用筛选');
 
-    const { member_address } = params.state
+    const { member_address, top_member_address } = params.state
 
     // 只保留接口支持的搜索参数
     params.setState({
-      member_address: member_address
+      member_address,
+      top_member_address
     });
   };
 
   const handleFilterAddress = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       params.setState({ member_address: event.target.value });
+    },
+    [params] // Include params in dependencies
+  );
+
+  const handleFilterAddress2 = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      params.setState({ top_member_address: event.target.value });
     },
     [params] // Include params in dependencies
   );
@@ -169,6 +180,36 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
     ]
   );
 
+  const [currentActionRow, setCurrentActionRow] = React.useState<Item | null>(null)
+  const [openSendModal, setOpenSendModal] = useState(false);
+
+  const handleSend = React.useCallback(
+    (row: Item) => {
+      setCurrentActionRow(row)
+      setOpenSendModal(true)
+    },
+    []
+  )
+
+  const handleConfirmSend = useCallback(async () => {
+    setOpenSendModal(false)
+    const toastId = toast.loading('正在发送中...');
+    try {
+      const response = await communitySubsidySend({ id: currentActionRow!.id })
+
+      if (response.code !== 0) return toast.error(response.message || '发送失败')
+        toast.success('发送成功');
+
+        getList();
+    } catch (error) {
+      console.error('发送失败:', error);
+      toast.error('发送失败', { id: toastId });
+    } finally {
+      toast.dismiss(toastId)
+      setCurrentActionRow(null)
+    }
+  }, [currentActionRow]);
+
   const columns: GridColDef[] = [
     {
       field: '$communityMemberAddress',
@@ -201,7 +242,20 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
       headerName: '奖励时间',
       minWidth: 200,
       renderCell: (params) => <CellWithTooltipCopy value={ params.row.created_at ? params.row.created_at_string : '-'} />,
-      valueFormatter: (valeu, row) => row.created_at ? row.created_at_string : ''
+      valueFormatter: (value, row) => row.created_at ? row.created_at_string : ''
+    },
+    {
+      field: 'is_send',
+      headerName: '津贴发送',
+      minWidth: 200,
+      renderCell: ({ value, row }) => (
+        <Switch
+          disabled={ value }
+          checked={ value }
+          onChange={ () => handleSend(row) }
+        />
+      ),
+      valueFormatter: (value, row) => value ? '已发送' : '未发送'
     }
   ];
 
@@ -244,7 +298,22 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
                 fullWidth
                 value={params.state.member_address}
                 onChange={handleFilterAddress}
-                placeholder="请输入地址"
+                placeholder="请输入社区地址"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </FormControl>
+            <FormControl component="fieldset" sx={{ flexShrink: 1, minWidth: { xs: 1, md: 200 } }}>
+              <TextField
+                fullWidth
+                value={params.state.top_member_address}
+                onChange={handleFilterAddress2}
+                placeholder="请输入0号线地址"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -326,6 +395,22 @@ export function CommunityRewardQueryPage(props: { h: boolean }) {
           />
         </Card>
       </DashboardContent>
+
+      <ConfirmDialog
+        open={openSendModal}
+        onClose={() => setOpenSendModal(false)}
+        title="确认状态变更"
+        content='确定要发送吗?'
+        action={
+          <Button
+            variant="contained"
+            color='error'
+            onClick={handleConfirmSend}
+          >
+            确认
+          </Button>
+        }
+      />
     </>
   );
 }
@@ -346,14 +431,21 @@ export function UserTableFiltersResult({ filters, totalResults, sx }: Props) {
     filters.setState({ member_address: '' });
   }, [filters]);
 
+  const handleRemoveAddress2 = useCallback(() => {
+    filters.setState({ top_member_address: '' });
+  }, [filters]);
+
   const handleReset = useCallback(() => {
-    filters.setState({ member_address: '' });
+    filters.setState({ member_address: '', top_member_address: '' });
   }, [filters]);
 
   return (
     <FiltersResult totalResults={totalResults} onReset={handleReset} sx={sx}>
-    <FiltersBlock label="地址:" isShow={!!filters.state.member_address}>
+    <FiltersBlock label="社区地址:" isShow={!!filters.state.member_address}>
       <Chip {...chipProps} label={filters.state.member_address} onDelete={handleRemoveAddress} />
+    </FiltersBlock>
+        <FiltersBlock label="0号线地址:" isShow={!!filters.state.top_member_address}>
+      <Chip {...chipProps} label={filters.state.top_member_address} onDelete={handleRemoveAddress2} />
     </FiltersBlock>
     </FiltersResult>
   );
