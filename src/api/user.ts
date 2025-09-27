@@ -1063,7 +1063,9 @@ export const getMenuCommunityAchievementList = (data: {
 }>('/admin/member/network_community_purchase', data)
 
 export const setLine0UserType = (data: { member_id: number }) => axios.post('/admin/member/set_top_member', data)
+
 export const setUserTypeAPI = (data: setUserTypeRequest) => axios.post('/admin/member/set_type', data)
+
 export const getCommunityRewardsList = (data: {
   date?: string;
   member_address: string;
@@ -1088,7 +1090,9 @@ export const getCommunityRewardsList = (data: {
   }>;
   total: number;
 }>('/admin/member/community_reward', data)
+
 export const setVirtualZoneOpenStatus = (data: { member_id: number; open_virtual_region: boolean; }) => axios.post('/admin/member/update_virtual_region', data)
+
 export const getCommunitySubsidy = (data: {
   member_address: string;
   top_member_address: string;
@@ -1112,3 +1116,5 @@ export const getCommunitySubsidy = (data: {
   total: number;
 }>('/admin/member/community_subsidy', data)
 export const communitySubsidySend = (data: { id: number; }) => axios.post('/admin/member/community_subsidy_send', data)
+
+export const updateRemark = (data: { id: number; remark: string;}) => axios.post('/admin/member/update_remark', data)

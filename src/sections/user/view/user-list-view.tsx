@@ -29,7 +29,6 @@ import React, { useState, useEffect, useCallback, useMemo, useReducer } from 're
 
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -54,6 +53,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Checkbox, IconButton, MenuItem, Switch } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
+import Dialog from '@mui/material/Dialog'
 
 import { useRouter } from 'src/routes/hooks';
 import { useBoolean } from 'src/hooks/use-boolean';
@@ -67,6 +67,8 @@ import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { EmptyContent } from 'src/components/empty-content';
 import { Label } from 'src/components/label';
 import dayjs from 'dayjs'
+import { Form, Field } from 'src/components/hook-form'
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -92,7 +94,8 @@ import {
   getMemberListReqeust,
   setUserTypeAPI,
   setLine0UserType,
-  setVirtualZoneOpenStatus
+  setVirtualZoneOpenStatus,
+  updateRemark
 } from 'src/api/user';
 import { ResetPasswordForm } from '../reset-password-form';
 import { AddressModifyForm } from '../address-modify-form';
@@ -103,6 +106,15 @@ import { CapitalFlowForm } from '../capital-flow-form';
 import { ChangeSuperiorForm } from '../change-superior-form';
 import { SetLevelForm } from '../set-level-form';
 import { type UserTypeItem } from './user-list-view.types'
+import { z as zod } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod'
+
+export type ResetPasswordSchemaType = zod.infer<typeof ResetPasswordSchema>;
+
+export const ResetPasswordSchema = zod.object({
+  remark: zod.string(),
+});
 
 // ----------------------------------------------------------------------
 // 筛选常量
@@ -389,6 +401,38 @@ export function UserListView(props: { h: boolean }) {
     [row]
   )
 
+  const getTogglableColumns = () =>
+    columns
+      .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
+      .map((column) => column.field);
+
+  const handleUserTypeFilter = React.useCallback(
+    (type: UserType) => {
+      filtersForEdit.setState({ type });
+    },
+    [filtersForEdit]
+  )
+
+  const [updateRemarksVisible, setUpdateRemarksVisible] = React.useState(false)
+  const [currentActionRow, setCurrentActionRow] = React.useState<Row | null>(null)
+  const defaultValues = {
+    remark: '',
+  };
+
+  const methods = useForm<ResetPasswordSchemaType>({
+    resolver: zodResolver(ResetPasswordSchema),
+    defaultValues,
+  });
+
+  const handleUpdateRemarks = React.useCallback(
+    (row: Row) => {
+      setCurrentActionRow(row)
+      setUpdateRemarksVisible(true)
+      methods.setValue('remark', row.remark || '')
+    },
+    []
+  )
+
   const columns: GridColDef[] = [
     {
       field: 'address',
@@ -590,42 +634,67 @@ export function UserListView(props: { h: boolean }) {
       ),
       valueFormatter: (value, row) => row.is_top_member ? '是' : '否',
     },
-    // {
-    //   type: 'actions',
-    //   field: 'actions',
-    //   pinnable: true,
-    //   headerName: '操作',
-    //   align: 'right',
-    //   headerAlign: 'right',
-    //   width: 80,
-    //   sortable: false,
-    //   filterable: false,
-    //   disableColumnMenu: true,
-    //   // Fixed column
-    //   headerClassName: 'sticky-column',
-    //   cellClassName: 'sticky-column',
-    //   getActions: (params) => [
-    //     <GridActionsCellItem
-    //       showInMenu
-    //       icon={<Iconify icon="mdi:currency-usd" />}
-    //       label="设置用户类型"
-    //       onClick={() => setUserType(params.row)}
-    //       disabled={false}
-    //     />,
-    //   ],
-    // },
+    {
+      type: 'actions',
+      field: 'actions',
+      pinnable: true,
+      headerName: '操作',
+      align: 'right',
+      headerAlign: 'right',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      // Fixed column
+      headerClassName: 'sticky-column',
+      cellClassName: 'sticky-column',
+      getActions: (params) => [
+        // <GridActionsCellItem
+        //   showInMenu
+        //   icon={<Iconify icon="mdi:currency-usd" />}
+        //   label="设置用户类型"
+        //   onClick={() => setUserType(params.row)}
+        //   disabled={false}
+        // />,
+        <GridActionsCellItem
+          showInMenu
+          icon={<Iconify icon="mdi:currency-usd" />}
+          label="更新会员备注"
+          onClick={ () => handleUpdateRemarks(params.row) }
+          disabled={false}
+        />,
+      ],
+    },
   ];
 
-  const getTogglableColumns = () =>
-    columns
-      .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
-      .map((column) => column.field);
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
 
-  const handleUserTypeFilter = React.useCallback(
-    (type: UserType) => {
-      filtersForEdit.setState({ type });
+  const onSubmit = handleSubmit(async (data) => {
+    const toastId = toast.loading('正在更新会员备注...')
+
+    try {
+      const { code, message } = await updateRemark({ id: currentActionRow!.id, remark: data.remark })
+
+      if (code !== 0) return toast.error(message || '更新会员备注失败')
+
+      toast.success('更新会员备注成功')
+      getList()
+    } catch (error) {
+      console.error(error);
+    } finally {
+      toast.dismiss(toastId)
+      setUpdateRemarksVisible(false)
+    }
+  })
+
+  const onClose = React.useCallback(
+    () => {
+      console.log('关闭成功')
     },
-    [filtersForEdit]
+    []
   )
 
   return (
@@ -829,6 +898,59 @@ export function UserListView(props: { h: boolean }) {
           </Button>
         }
       />
+
+      <Dialog
+        fullWidth
+        maxWidth="xs"
+        open={updateRemarksVisible}
+        onClose={ onClose }
+        transitionDuration={{
+          enter: theme.transitions.duration.shortest,
+          exit: theme.transitions.duration.shortest - 80,
+        }}
+        PaperProps={{
+          sx: {
+            display: 'flex',
+            overflow: 'hidden',
+            flexDirection: 'column',
+            '& form': { minHeight: 0, display: 'flex', flex: '1 1 auto', flexDirection: 'column' },
+          },
+        }}
+      >
+
+      <DialogTitle sx={{ minHeight: 60, }}>
+        更新会员备注
+      </DialogTitle>
+
+      <DialogContent sx={{ p: 2, pb: 0, display: 'flex', flexDirection: 'column', minHeight: 100 }}>
+        <Form methods={ methods } onSubmit={ onSubmit }>
+          <Stack spacing={2} sx={{ flex: 1 }} style={ { marginTop: '10px' } }>
+            <Field.Text
+              autoFocus
+              name="remark"
+              label="会员备注"
+              placeholder="请输入您需要更新的会员备注"
+              InputLabelProps={{ shrink: true }}
+              multiline
+            />
+          </Stack>
+
+          <DialogActions sx={{ px: 0, pb: 2, mt: 'auto' }}>
+            <Button variant="outlined" onClick={ () => setUpdateRemarksVisible(false) }>
+              取消
+            </Button>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              loading={isSubmitting}
+            >
+              确认
+            </LoadingButton>
+          </DialogActions>
+        </Form>
+      </DialogContent>
+
+      </Dialog>
     </>
   );
 }
