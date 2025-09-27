@@ -69,12 +69,13 @@ export const OrganizationalChart = memo(function OrganizationalChart<T extends N
   const label = cloneNode({ ...data } as unknown as T);
   // console.warn('OrganizationalChart data:', data);
   const renderList = useMemo(() => filterData(data.children ?? [], 'id'), [data.children]);
+  const lineColor = theme.palette.divider ?  'rgba(0, 0, 0, 0.6)' : theme.palette.divider;
   return (
     <Tree
       lineWidth="1.5px"
       nodePadding="4px"
       lineBorderRadius="24px"
-      lineColor={theme.vars.palette.divider}
+      lineColor={lineColor}
       label={label}
       {...other}
       key={data.id}
