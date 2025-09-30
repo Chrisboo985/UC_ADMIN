@@ -149,6 +149,7 @@ export const navData = [
           // { title: '债券销售记录', path: paths.dashboard.financialConsole.bondSalesRecords },
           // { title: '债券分红流水', path: paths.dashboard.financialConsole.bondBonusIndex },
           { title: '认购节点记录', path: paths.dashboard.financialConsole.nodeOrderList },
+          { title: '网体节点认购列表', path: paths.dashboard.financialConsole.networkNodeSubscriptionList },
         ],
       },
       {

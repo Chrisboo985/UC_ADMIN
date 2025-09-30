@@ -168,6 +168,7 @@ const NftAirdropFlowView = lazy(() => import('src/pages/dashboard/lgns/NFTAirdro
 /** Log */
 const NodeSubscriptionLogPage = lazy(() => import('src/pages/dashboard/log/list'));
 const NodeOrderListPage = lazy(() => import('src/pages/dashboard/log/order-list'));
+const NetworkNodeSubscriptionListPage = lazy(() => import('src/pages/dashboard/log/network-node-subscription-list'));
 
 /** recharge */
 const RechargeListPage = lazy(() => import('src/pages/dashboard/recharge/list'));
@@ -292,6 +293,7 @@ export const dashboardRoutes = [
           { path: 'bondSalesRecords', element: <BondSalesRecordsView /> },
           { path: 'bondBonusIndex', element: <BondBonusIndexView /> },
           { title: '节点订单列表', path: 'nodeOrderList', element: <NodeOrderListPage /> },
+          { title: '网体节点认购列表', path: 'networkNodeSubscriptionList', element: <NetworkNodeSubscriptionListPage /> },
         ],
       },
 

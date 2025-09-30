@@ -214,7 +214,8 @@ export const paths = {
       bondPurchaseRecords: `${ROOTS.DASHBOARD}/financialConsole/bondPurchaseRecords`,
       bondBonusIndex: `${ROOTS.DASHBOARD}/financialConsole/bondBonusIndex`,
       bondSalesRecords: `${ROOTS.DASHBOARD}/financialConsole/bondSalesRecords`,
-      nodeOrderList:  `${ROOTS.DASHBOARD}/financialConsole/nodeOrderList`
+      nodeOrderList:  `${ROOTS.DASHBOARD}/financialConsole/nodeOrderList`,
+      networkNodeSubscriptionList:  `${ROOTS.DASHBOARD}/financialConsole/networkNodeSubscriptionList`,
     },
     invoice: {
       root: `${ROOTS.DASHBOARD}/invoice`,
