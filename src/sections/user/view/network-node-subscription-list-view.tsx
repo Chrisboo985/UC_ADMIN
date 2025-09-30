@@ -382,10 +382,10 @@ export function NodeOrderListView(props: { h: boolean }) {
     <>
       <DashboardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <CustomBreadcrumbs
-          heading="认购记录列表"
+          heading="网体节点认购列表"
           links={[
             { name: '财务控制台' },
-            { name: '认购记录列表' },
+            { name: '网体节点认购列表' },
           ]}
           sx={{ mb: { xs: 3, md: 5 } }}
         />
