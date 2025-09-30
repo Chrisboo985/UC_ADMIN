@@ -51,6 +51,12 @@ export function CustomDateRangePicker({
     setPrevEndDate(endDate);
   }, [startDate, endDate, open]);
 
+  // 同步内部 current* 到外部传入的 start/end（以及打开时）
+  useEffect(() => {
+    setCurrentStartDate(startDate);
+    setCurrentEndDate(endDate);
+  }, [startDate, endDate, open]);
+
   const handleCancel = () => {
     // 点击取消时，重置为上次有效的日期
     setCurrentStartDate(prevStartDate);
@@ -72,6 +78,9 @@ export function CustomDateRangePicker({
   };
 
   const handleReset = () => {
+    // 立刻清空内部显示
+    setCurrentStartDate(null);
+    setCurrentEndDate(null);
     if (onApply) {
       onApply(null, null); // 将选择的日期传递给父组件
     }
@@ -111,6 +120,7 @@ export function CustomDateRangePicker({
                 <StaticDateTimePicker
                   value={currentStartDate}
                   onChange={setCurrentStartDate}
+                  views={["year","month","day","hours","minutes","seconds"]}
                   slotProps={{
                     actionBar: {
                       actions: [],
@@ -126,6 +136,7 @@ export function CustomDateRangePicker({
                 <StaticDateTimePicker
                   value={currentEndDate}
                   onChange={setCurrentEndDate}
+                  views={["year","month","day","hours","minutes","seconds"]}
                   slotProps={{
                     actionBar: {
                       actions: [],
@@ -140,13 +151,19 @@ export function CustomDateRangePicker({
                 label="开始时间"
                 value={currentStartDate}
                 onChange={setCurrentStartDate}
-                format="YYYY-MM-DD HH:mm"
+                format="YYYY-MM-DD HH:mm:ss"
+                views={["year","month","day","hours","minutes","seconds"]}
+                timeSteps={{ hours: 1, minutes: 1, seconds: 1 }}
+                slotProps={{ textField: { placeholder: '开始时间', inputProps: { readOnly: true } } }}
               />
               <DateTimePicker
                 label="结束时间"
                 value={currentEndDate}
                 onChange={setCurrentEndDate}
-                format="YYYY-MM-DD HH:mm"
+                format="YYYY-MM-DD HH:mm:ss"
+                views={["year","month","day","hours","minutes","seconds"]}
+                timeSteps={{ hours: 1, minutes: 1, seconds: 1 }}
+                slotProps={{ textField: { placeholder: '结束时间', inputProps: { readOnly: true } } }}
               />
             </>
           )}

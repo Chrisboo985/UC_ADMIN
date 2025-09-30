@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import Chip from '@mui/material/Chip';
 
 import { chipProps, FiltersBlock, FiltersResult } from 'src/components/filters-result';
+import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +29,17 @@ export function UserTableFiltersResult({ filters, totalResults, sx }: Props) {
   }, [filters]);
 
   const handleReset = useCallback(() => {
-    filters.setState({ member_code: '', address: '', remark: '' });
+    filters.setState({
+      member_code: '',
+      address: '',
+      remark: '',
+      created_at_start: undefined,
+      created_at_end: undefined,
+    });
+  }, [filters]);
+
+  const handleRemoveDateRange = useCallback(() => {
+    filters.setState({ created_at_start: undefined, created_at_end: undefined });
   }, [filters]);
 
   return (
@@ -41,6 +52,13 @@ export function UserTableFiltersResult({ filters, totalResults, sx }: Props) {
       </FiltersBlock>
       <FiltersBlock label="用户编码:" isShow={!!filters.state.member_code}>
         <Chip {...chipProps} label={filters.state.member_code} onDelete={handleRemoveMemberCode} />
+      </FiltersBlock>
+      <FiltersBlock label="时间范围:" isShow={!!filters.state.created_at_start && !!filters.state.created_at_end}>
+        <Chip
+          {...chipProps}
+          label={`${ dayjs.unix(filters.state.created_at_start).format('YYYY-MM-DD HH:mm:ss') } - ${ dayjs.unix(filters.state.created_at_end).format('YYYY-MM-DD HH:mm:ss') }`}
+          onDelete={handleRemoveDateRange}
+        />
       </FiltersBlock>
       {/* <FiltersBlock label="时间范围:" isShow={!!filters.state.address}>
         <Chip {...chipProps} label={filters.state.address} onDelete={handleRemoveKeyword} />

@@ -955,6 +955,10 @@ export const getNodeSubscriptionLogListAPI = (data: getNodeSubscriptionLogListRe
 export type getMemberListReqeust = {
   address: string;
   type: UserType;
+  /** 开始时间（unix 秒），为空传 null */
+  created_at_start?: number | null;
+  /** 结束时间（unix 秒），为空传 null */
+  created_at_end?: number | null;
 }
 
 /** 用户类型 */
