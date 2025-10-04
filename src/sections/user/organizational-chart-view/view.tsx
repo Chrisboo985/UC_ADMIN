@@ -536,7 +536,7 @@ export function OrganizationalChartView() {
   const renderNode = useCallback((props: NodeProps) => {
     const loading = nodeManager.isLoading(parseInt((props.id ?? '0').toString(), 10), requestVersionRef.current);
     console.log('renderNode:', props);
-    const isTopMember = props.id === props?.details?.is_top_member;
+    const isTopMember = props?.details?.is_top_member;
 
     const isCommunityNode = props?.details?.type === 'community';
     /**
@@ -551,7 +551,7 @@ export function OrganizationalChartView() {
       sx.backgroundColor = 'primary.lighter';
     }
     if (isTopMember) {
-      sx.backgroundColor = 'primary.main';
+      sx.backgroundColor = 'warning.lighter';
     }
     return (
       <StandardNode
