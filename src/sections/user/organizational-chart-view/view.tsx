@@ -344,7 +344,10 @@ export function OrganizationalChartView() {
       return nodes.map((node: any) => {
         const child = buildTree(node.id);
         return {
-          ...node,
+          details: node,
+          id: node.id,
+          address: node.address,
+          parent_id: node.parent_id,
           children: child.length > 0 ? child : null,
         };
       });
@@ -557,7 +560,7 @@ export function OrganizationalChartView() {
       <StandardNode
         {...props}
         loading={loading}
-        sx={sx}
+        sx={{...sx}}
       />
     );
   },[nodeManager]);
