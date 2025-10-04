@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useCallback, useState, useEffect, useRef, CSSProperties } from 'react';
 import { throttle, debounce, map } from 'lodash-es';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 import Stack from '@mui/material/Stack';
@@ -27,7 +27,7 @@ const EXPIRED_TIME = 60 * 1000;
 const PAGINATION = { page: 1, pageSize: 99999 };
 const VIEWPORT_MARGIN = 200;
 const INITIAL_DEPTH_LIMIT = 4;
-const INITIAL_ROOT_NODE = { id: 0, address: '', parent_id: 0, children: [] };
+const INITIAL_ROOT_NODE = { id: 0, address: '', parent_id: 0, children: [], details: {} };
 
 // Types
 interface DataCache {
@@ -370,6 +370,7 @@ export function OrganizationalChartView() {
       nodeManager.reset();
       setMapData(new Map());
       setTreeData({
+        details: node,
         id: Number((node as any).id),
         address: (node as any).address ?? '',
         parent_id: Number((node as any).parent_id ?? 0),
@@ -405,6 +406,7 @@ export function OrganizationalChartView() {
           nodeManager.reset();
           setMapData(new Map());
           setTreeData({
+            details: node,
             id: Number((node as any).id),
             address: (node as any).address ?? '',
             parent_id: Number((node as any).parent_id ?? 0),
@@ -534,14 +536,28 @@ export function OrganizationalChartView() {
   const renderNode = useCallback((props: NodeProps) => {
     const loading = nodeManager.isLoading(parseInt((props.id ?? '0').toString(), 10), requestVersionRef.current);
     console.log('renderNode:', props);
+    const isTopMember = props.id === props?.details?.is_top_member;
+
+    const isCommunityNode = props?.details?.type === 'community';
+    /**
+     * 1. 如果是社区节点，需要一个特别的外观样式
+     * 2. 如果是顶级会员，需要一个特别的外观样式
+     */
+    const sx = {
+      width: 300,
+      opacity: loading ? 0.6 : 1,
+    } as CSSProperties;
+    if (isCommunityNode) {
+      sx.backgroundColor = 'primary.lighter';
+    }
+    if (isTopMember) {
+      sx.backgroundColor = 'primary.main';
+    }
     return (
       <StandardNode
         {...props}
         loading={loading}
-        sx={{
-          width: 300,
-          opacity: loading ? 0.6 : 1,
-        }}
+        sx={sx}
       />
     );
   },[nodeManager]);
