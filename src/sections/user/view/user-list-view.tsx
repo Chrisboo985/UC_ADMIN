@@ -642,12 +642,6 @@ export function UserListView(props: { h: boolean }) {
       field: 'open_virtual_region',
       headerName: '是否虚拟大区',
       minWidth: 120,
-      renderCell: (value) => (<CellWithTooltipCopy value={value ? '是' : '否'} />
-        // <Switch
-        //   checked={ params.row.open_virtual_region }
-        //   onChange={ () => handleVirtualZoneOpenStatusChange(params.row) }
-        // />
-      ),
       valueFormatter: (value) => value ? '是' : '否'
     },
     {
