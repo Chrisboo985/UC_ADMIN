@@ -348,6 +348,7 @@ export function OrganizationalChartView() {
           id: node.id,
           address: node.address,
           parent_id: node.parent_id,
+          ...node,
           children: child.length > 0 ? child : null,
         };
       });
@@ -374,9 +375,8 @@ export function OrganizationalChartView() {
       setMapData(new Map());
       setTreeData({
         details: node,
-        id: Number((node as any).id),
-        address: (node as any).address ?? '',
         parent_id: Number((node as any).parent_id ?? 0),
+        ...node,
         children: [],
       });
       setRootId(Number(node.id));
